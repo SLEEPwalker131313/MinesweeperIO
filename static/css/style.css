@@ -1,0 +1,21 @@
+body{
+  height: 100%;
+  width: 100%;
+}
+#name-form{
+  background-color: yellow;
+  height: 50%;
+  width: 300px;
+}
+#main-block, #status, #leaderboard{
+  display: none;
+}
+.visible{
+  display: block;
+}
+.matrix-element{
+  background-color: red;
+  width: 30px;
+  position: relative;
+  float: left;
+}

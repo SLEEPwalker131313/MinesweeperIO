@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Наша многопользовательская игра</title>
+    <title>MinesweeperIO</title>
     <style>
       canvas {
         width: 800px;
@@ -9,9 +9,48 @@
       }
     </style>
     <script src="/socket.io/socket.io.js?x18050"></script>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <!-- <div id="name_input_div">
+    </div>
+    <div id="start_game_btn">
+      Start game
+    </div> -->
+    <form id="name-form">
+      <div class="input-group">
+        <input type="text"
+               class="form-control"
+               id="name-input"
+               placeholder="Nickname"
+               autocomplete="off" />
+        <span class="input-group-addon"
+              id="name-submit">
+          Play
+        </span>
+      </div>
+    </form>
+    <div id="status">
+      <div class="name">
+        dsad
+      </div>
+    </div>
+    <div id="main-block">
+      <!-- <canvas id="canvas"></canvas> -->
+      <div id="matrix">
+        <div class="matrix-element 1">1</div>
+        <div class="matrix-element 2">2</div>
+        <div class="matrix-element 3">3</div>
+        <div class="matrix-element 4">4</div>
+        <div class="matrix-element 5">5</div>
+        <div class="matrix-element 6">6</div>
+      </div>
+    </div>
+    <div id="leaderboard">
+      lead
+    </div>
   </body>
-  <script src="/static/game.js?x18050"></script>
+  <script src="/static/client.js?x18050"></script>
+  <script src="/static/Game.js"></script>
 </html>
