@@ -64,10 +64,30 @@ GameItem.prototype.step = function(x, y, user, cb) {
     console.log('models.step2');
     // console.log(this.field);
     // console.log('x: ' + x + ' y: ' + y);
+    var tmp = [];
+
+    function logNearSpace(field1, x, y, maxx, maxy){
+      if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && field1[x+'x'+y] === 0 && tmp.indexOf(x+'x'+y) == -1){
+        tmp.push(x+'x'+y);
+        console.log('x: ' + x + ' y: ' + y);
+        // logNearSpace(field1, x - 1, y - 1, maxx, maxy);
+        logNearSpace(field1, x - 1, y, maxx, maxy);
+        // logNearSpace(field1, x - 1, y + 1, maxx, maxy);
+        logNearSpace(field1, x, y - 1, maxx, maxy);
+        logNearSpace(field1, x, y + 1, maxx, maxy);
+        // logNearSpace(field1, x + 1, y - 1, maxx, maxy);
+        logNearSpace(field1, x + 1, y, maxx, maxy);
+        // logNearSpace(field1, x + 1, y + 1, maxx, maxy);
+      } else {
+        return;
+      }
+    }
     console.log(this.field[x + 'x' + y]);
     console.log('field: ' + this.field[x + 'x' + y]);
     if(this.field[x + 'x' + y] === true){
       console.log('boom! ' + user);
+    } else{
+      logNearSpace(this.field, x, y, this.x, this.y);
     }
 
     this.board[x + 'x' + y] = this.getTurn(user);
@@ -111,11 +131,40 @@ Minesweeper.prototype.start = function(user, cb) {
         var mines = 0;
         var irow, icol;
         while(mines < 99) {
-          irow = getRandomInRange(1, 16);
-          icol = getRandomInRange(1, 30);
+          irow = getRandomInRange(1, this.x);
+          icol = getRandomInRange(1, this.y);
           if(field1[irow+'x'+icol] == false){
             field1[irow+'x'+icol] = true;
             ++mines;
+          }
+        }
+
+        function mineAt(x, y, maxx, maxy) {
+          if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && field1[x+'x'+y] === true) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }
+
+        function minesNear(x, y, maxx, maxy){
+          var mines = 0;
+          mines += mineAt(x - 1, y - 1, maxx, maxy);
+          mines += mineAt(x - 1, y, maxx, maxy);
+          mines += mineAt(x - 1, y + 1, maxx, maxy);
+          mines += mineAt(x, y - 1, maxx, maxy);
+          mines += mineAt(x, y + 1, maxx, maxy);
+          mines += mineAt(x + 1, y - 1, maxx, maxy);
+          mines += mineAt(x + 1, y, maxx, maxy);
+          mines += mineAt(x + 1, y + 1, maxx, maxy);
+          return mines;
+        }
+
+        for (var rows = 1; rows <= this.x; rows++) {
+          for (var cols = 1; cols <= this.y; cols++){
+            if(field1[rows+'x'+cols] !== true){
+              field1[rows+'x'+cols] = minesNear(rows,cols, this.x, this.y);
+            }
           }
         }
 
