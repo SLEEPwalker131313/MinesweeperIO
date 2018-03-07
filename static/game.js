@@ -91,11 +91,17 @@ var Minesweeper = {
                 Minesweeper.endGame(turn, 'timeout');
                 // _gaq.push(['_trackEvent', 'Game', 'Timeout']);
             });
+
             // К нам подключился соперник, начинаем игру
-            socket.on('ready', function(gameId, turn, x, y) {
+            socket.on('ready', function(gameId, turn, x, y, field) {
+              console.log('ready!!! field');
+              console.log(field);
               console.log("ready " + gameId);
+              // console.log(io);
                 $('#status').html('К вам подключился соперник! Игра началась! ' + (turn == 'X' ? 'Сейчас Ваш первый ход' : 'Сейчас ходит соперник') + '!');
-                Minesweeper.startGame(gameId, turn, x, y);
+                // console.log('gameId ' + gameId);
+                // console.log('field1 ' + field1);
+                Minesweeper.startGame(gameId, turn, x, y, field);
                 console.log(turn);
                 $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
 
@@ -123,6 +129,8 @@ var Minesweeper = {
                   // console.log('tmp2 ' + tmp2);
                   // console.log('tmp ' + tmp);
                   // console.log('$("#current-symbol").text() ' + $('#current-symbol').text());
+                  // console.log(Minesweeper);
+                  // console.log(GameItem);
                     if(Minesweeper.i) socket.emit('step', Minesweeper.gameId, e.target.id, tmp);      //за начальными символами сюда.
                 }).hover(function(){
                     $(this).toggleClass('ui-state-hover');
@@ -152,15 +160,21 @@ var Minesweeper = {
         });
     },
 
-    startGame: function (gameId, turn, x, y) {
+    startGame: function (gameId, turn, x, y, field) {
         this.gameId = gameId;
         this.turn = turn;
         this.i = (turn == 'X');
+        console.log('field in start');
+        console.log(field);
+        console.log(field[3]);
+        // console.log("start!!");
+        // console.log(field);
+        var count = 0;
         var table = $('#board-table').empty();
         for(var i = 1; i <= y; i++) {
             var tr = $('<tr/>');
             for(var j = 0; j < x; j++) {
-                tr.append($('<td/>').attr('id', (j+1) + 'x' + i).addClass('ui-state-default').html('&nbsp;'));
+                tr.append($('<td/>').attr('id', (j+1) + 'x' + i).addClass('ui-state-default').html(field[count++]));
             }
             table.append(tr);
         }

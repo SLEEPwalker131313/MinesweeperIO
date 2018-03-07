@@ -84,8 +84,21 @@ io.on('connection', function(socket) {
             socket.join(gameId);
             io.sockets.sockets[opponent].join(gameId);
             console.log('ready gameId: ' + gameId + ' x: ' +x + ' y: ' + y);
-            socket.emit('ready', gameId, 'X', x, y);
-            io.sockets.sockets[opponent].emit('ready', gameId, 'O', x, y);
+            var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
+
+            socket.emit('ready', gameId, 'X', x, y, arr);
+            console.log('games');
+            // console.log(Game.games[gameId].field['2x4']);
+            // console.log(Object.keys(Game.games[gameId].field));
+            // console.log(JSON.parse(Game.games[gameId].field));
+            // socket.emit('field', Game.games[gameId].field);
+            // socket.emit('field', Object.keys(Game.games[gameId].field));
+
+            // var arr = 'ds'
+            // socket.emit('field', Game.games[gameId].field);
+            // socket.emit('field', arr);
+            console.log(arr);
+            io.sockets.sockets[opponent].emit('ready', gameId, 'O', x, y, arr);
             countGames++;
         } else {
             // ожидает аппонента

@@ -18,11 +18,12 @@ var Minesweeper = module.exports = function() {
 }
 util.inherits(Minesweeper, EventEmitter);
 
-var GameItem = function(user, opponent, x, y, numberOfMines) {
+var GameItem = function(user, opponent, x, y, numberOfMines, field1) {
     // Инициализируем события
     EventEmitter.call(this);
     // Ячейки игрового поля
     this.board = [];
+    this.field = field1;
     // Игроки
     this.user = user; // X
     this.opponent = opponent; // O
@@ -87,7 +88,36 @@ Minesweeper.prototype.start = function(user, cb) {
         var opponent = Object.keys(this.free).shift();
         delete this.free[opponent];
         // Если есть ожидающие игру, создаём им игру
-        var game = new GameItem(user, opponent, this.x, this.y, this.stepsToWin);
+
+        function getRandomInRange(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        getRandomInRange(1, 10)
+
+        var field1 = [];
+        console.log('start!!!');
+        for (var rows = 0; rows < this.x; rows++) {
+          for (var cols = 0; cols < this.y; cols++){
+            field1[rows+'x'+cols] = false;
+          }
+        }
+
+        // console.log(field1[1+'x'+2] == true);
+
+        var mines = 0;
+        var irow, icol;
+        while(mines < 99) {
+          irow = getRandomInRange(0, 29);
+          icol = getRandomInRange(0, 15);
+          if(field1[irow+'x'+icol] == false){
+            field1[irow+'x'+icol] = true;
+            ++mines;
+          }
+        }
+        // console.log(field1);
+
+        var game = new GameItem(user, opponent, this.x, this.y, this.stepsToWin, field1);
         var id = [
             Math.random() * 0xffff | 0
             , Math.random() * 0xffff | 0
@@ -98,6 +128,7 @@ Minesweeper.prototype.start = function(user, cb) {
         this.games[id] = game;
         this.users[user] = id;
         this.users[opponent] = id;
+
         //console.dir(this.games[id]);
         // game.emit('timer', 'start', user);
         cb(true, id, opponent, this.x, this.y);
