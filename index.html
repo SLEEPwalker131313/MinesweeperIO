@@ -11,13 +11,14 @@
     <script src="/socket.io/socket.io.js?x18050"></script>
     <link rel="stylesheet" href="static/css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/static/game.js"></script>
   </head>
-  <body>
+  <body onload="Minesweeper.init();">
     <!-- <div id="name_input_div">
     </div>
     <div id="start_game_btn">
       Start game
-    </div> -->
+    </div>-->
     <form id="name-form">
       <div class="input-group">
         <input type="text"
@@ -31,9 +32,17 @@
         </span>
       </div>
     </form>
-    <div id="status">
+    <div id="state">
       <div class="name">
-        dsad
+        Unnamed
+      </div>
+      <div class="stat">
+
+      </div>
+      <div id="stats">
+      </div>
+      <div class="connect">
+
       </div>
     </div>
     <div id="main-block">
@@ -47,10 +56,21 @@
         <div class="matrix-element 6">6</div>
       </div>
     </div>
+    <table id="board-table">
+
+    </table>
     <div id="leaderboard">
       lead
     </div>
+    <div id="status">
+    </div>
+    <div id="reload">
+      reload
+    </div>
+    <div id="connect-status">
+      connect-status
+    </div>
+
   </body>
   <script src="/static/client.js?x18050"></script>
-  <script src="/static/Game.js"></script>
 </html>

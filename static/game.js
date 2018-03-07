@@ -1,0 +1,196 @@
+var Minesweeper = {
+    gameId: null,
+    turn: null,
+    i: false,
+    interval: null,
+    init: function() {
+        $(function() {
+            // Подключаемся к серверу nodejs с socket.io
+            console.log('check');
+            var socket = io.connect(window.location.hostname + ':5000', {resource: 'api'});
+            // $('#reload').hide().button({icons:{primary:'ui-icon-refresh'}}).click(function() {
+            //     $('#reload').off('click').click(function(){window.location.reload();});
+            //     socket.emit('start');
+            // });
+
+            //реакция на нажатие кнопки ввода имени
+            $('#name-input').focus();
+              function send_name() {
+                var name = $('#name-input').val();
+                if (name && name.length < 20) {
+                  socket.emit('new-player', {
+                    name: name
+                  });
+                  //START
+                  socket.emit('start');
+
+                } else {
+                  window.alert('Your name cannot be blank or over 20 characters.');
+                }
+                //говнокод.
+                $('#main-block').css('display', 'block');
+                // $('#status').css('display', 'block');
+                $('#leaderboard').css('display', 'block');
+                $('.name').html(name);
+                $('#name-form').css('display', 'none');
+                //run after btn press
+                // socket.emit('start');
+                return false;
+            };
+            $('#name-form').submit(send_name);
+            $('#name-submit').click(send_name);
+
+              ////////////////////////////////////////////
+
+
+            socket.on('stats', function(data) {
+              // console.log(data);
+              // $('.stats').html(data[3]);
+              // console.log(data);
+            });
+
+            socket.on('connect', function () {
+                $('#status').html('Успешно подключились к игровому серверу');
+                $('#reload').show();
+                // _gaq.push(['_trackEvent', 'WebSocket', 'Success']);
+            });
+            socket.on('reconnect', function () {
+                $('#reload').show();
+                $('#connect-status').html('Переподключились, продолжайте игру');
+                // _gaq.push(['_trackEvent', 'WebSocket', 'Reconnect']);
+            });
+            socket.on('reconnecting', function () {
+                $('#reload').hide();
+                $('#status').html('Соединение с сервером потеряно, переподключаемся...');
+                // _gaq.push(['_trackEvent', 'WebSocket', 'Reconnecting']);
+            });
+            socket.on('error', function (e) {
+                $('#status').html('Ошибка: ' + (e ? e : 'неизвестная ошибка'));
+                // _gaq.push(['_trackEvent', 'WebSocket', 'Error', (e ? e : 'неизвестная ошибка')]);
+            });
+
+            // socket.on('ww', function(data){
+            //   console.log(data);
+            // });
+            // Ожидаем соперника
+            socket.on('wait', function(){
+              console.log('waitttt');
+                $('#status').append('... Ожидаем соперника...');
+                // _gaq.push(['_trackEvent', 'Game', 'Wait']);
+            });
+            // Соперник отлючился
+            socket.on('exit', function(){
+                Minesweeper.endGame(Minesweeper.turn, 'exit');
+                // _gaq.push(['_trackEvent', 'Game', 'Exit']);
+            });
+            // Время на ход вышло
+            socket.on('timeout', function(turn) {
+                Minesweeper.endGame(turn, 'timeout');
+                // _gaq.push(['_trackEvent', 'Game', 'Timeout']);
+            });
+            // К нам подключился соперник, начинаем игру
+            socket.on('ready', function(gameId, turn, x, y) {
+              console.log("ready " + gameId);
+                $('#status').html('К вам подключился соперник! Игра началась! ' + (turn == 'X' ? 'Сейчас Ваш первый ход' : 'Сейчас ходит соперник') + '!');
+                Minesweeper.startGame(gameId, turn, x, y);
+                console.log(turn);
+                $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
+                $("#board-table td").click(function (e) {
+                    if(Minesweeper.i) socket.emit('step', Minesweeper.gameId, e.target.id);
+                }).hover(function(){
+                    $(this).toggleClass('ui-state-hover');
+                }, function(){
+                    $(this).toggleClass('ui-state-hover');
+                });
+                // _gaq.push(['_trackEvent', 'Game', 'Start', gameId]);
+            });
+            // Получаем ход
+            socket.on('step', function(id, turn, win) {
+                //console.info('step', id, turn, win);
+                Minesweeper.move(id, turn, win);
+                // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
+            });
+            // Статистика
+            socket.on('stats', function (arr) {
+                var stats = $('#stats');
+                stats.find('div').not('.turn').remove();
+                for(val in arr) {
+                    stats.prepend($('<div/>').attr('class', 'ui-state-hover ui-corner-all').html(arr[val]));
+                }
+            });
+        });
+    },
+
+    startGame: function (gameId, turn, x, y) {
+        this.gameId = gameId;
+        this.turn = turn;
+        this.i = (turn == 'X');
+        var table = $('#board-table').empty();
+        for(var i = 1; i <= y; i++) {
+            var tr = $('<tr/>');
+            for(var j = 0; j < x; j++) {
+                tr.append($('<td/>').attr('id', (j+1) + 'x' + i).addClass('ui-state-default').html('&nbsp;'));
+            }
+            table.append(tr);
+        }
+        $("#board,#timerpanel").show();
+        // this.mask(!this.i);
+    },
+
+    // mask: function(state) {
+    //     var mask = $('#masked'), board = $('#board-table');
+    //     clearInterval(this.interval);
+    //     $('#timer').html(15);
+    //     this.interval = setInterval(function(){
+    //         var i = parseInt($('#timer').html()); i--;
+    //         $('#timer').html(i);
+    //     }, 1000);
+    //     if(state) {
+    //         mask.show();
+    //         var p = board.position();
+    //         mask.css({
+    //             width: board.width(),
+    //             height: board.height(),
+    //             // left: p.left,
+    //             // top: p.top
+    //         });
+    //     } else {
+    //         mask.hide();
+    //     }
+    // },
+
+    move: function (id, turn, win) {
+        this.i = (turn != this.turn);
+        $("#" + id).attr('class', 'ui-state-hover').html(turn);
+        if (!win) {
+            // this.mask(!this.i);
+            $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
+        } else {
+            this.endGame(turn, win);
+        }
+    },
+
+    endGame: function (turn, win) {
+        clearInterval(this.interval);
+        var text = '';
+        switch(win) {
+            case 'none': text = 'Ничья!'; break;
+            case 'timeout': text = (turn == this.turn ? 'Слишком долго думали! Вы проиграли!' : 'Соперник так и не смог решить как ему ходить! Вы победили!'); break;
+            case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
+            default: text = 'Вы ' + (this.i ? 'проиграли! =(' : 'выиграли! =)');
+        }
+        $("<div/>").html(text).dialog({
+            title: 'Конец игры',
+            modal: true,
+            closeOnEscape: false,
+            resizable: false,
+            buttons: { "Играть по новой": function() {
+                $(this).dialog("close");
+                window.location.reload();
+            }},
+            close: function() {
+                window.location.reload();
+            }
+        });
+    }
+};

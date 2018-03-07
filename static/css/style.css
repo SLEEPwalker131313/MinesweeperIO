@@ -7,7 +7,7 @@ body{
   height: 50%;
   width: 300px;
 }
-#main-block, #status, #leaderboard{
+#main-block, #leaderboard{
   display: none;
 }
 .visible{
@@ -18,4 +18,16 @@ body{
   width: 30px;
   position: relative;
   float: left;
+}
+
+.ui-state-default{
+  background-color: blue;
+}
+
+.ui-state-hover{
+  background-color: yellow;
+}
+
+#board-table{
+  border: 3px;
 }
