@@ -10,15 +10,15 @@ var Minesweeper = module.exports = function() {
     // Массив пользователей ожидающих оппонентов для начало игры
     this.free = [];
     // Размеры поля
-    this.x = 6;
-    this.y = 6;
+    this.x = 30;
+    this.y = 16;
     // Шагов до победы
-    this.numberOfMines = 4;
-    this.stepsToWin = 4;
+    this.numberOfMines = 99;
+    // this.stepsToWin = 4;
 }
 util.inherits(Minesweeper, EventEmitter);
 
-var GameItem = function(user, opponent, x, y, stepsToWin) {
+var GameItem = function(user, opponent, x, y, numberOfMines) {
     // Инициализируем события
     EventEmitter.call(this);
     // Ячейки игрового поля
@@ -30,27 +30,27 @@ var GameItem = function(user, opponent, x, y, stepsToWin) {
     this.x = x;
     this.y = y;
     // Шагов до победы
-    this.stepsToWin = stepsToWin;
+    // this.stepsToWin = stepsToWin;
     //Число мин
-    this.numberOfMines = 4;
+    this.numberOfMines = numberOfMines;
     // Кол-во сделанных ходов
     this.steps = 0;
     // Кто ходит
     this.turn = 'X';
     // Таймер хода
-    this.timeout = null;
+    // this.timeout = null;
     // Запускаем таймер
-    this.on('timer', function(state, user) {
-        if(state == 'stop') {
-            clearTimeout(this.timeout);
-            this.timeout = null;
-        } else {
-            var game = this;
-            this.timeout = setTimeout(function() {
-                game.emit('timeout', user);
-            }, 15000);
-        }
-    });
+    // this.on('timer', function(state, user) {
+    //     if(state == 'stop') {
+    //         clearTimeout(this.timeout);
+    //         this.timeout = null;
+    //     } else {
+    //         var game = this;
+    //         this.timeout = setTimeout(function() {
+    //             game.emit('timeout', user);
+    //         }, 15000);
+    //     }
+    // });
 }
 util.inherits(GameItem, EventEmitter);
 
@@ -59,14 +59,15 @@ util.inherits(GameItem, EventEmitter);
  */
 GameItem.prototype.step = function(x, y, user, cb) {
   console.log('models.step');
-    if(this.board[x + 'x' + y] !== undefined || this.getTurn(user) != this.turn) return;
+    if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
 
-    this.emit('timer', 'stop');
+    // this.emit('timer', 'stop');
+    this.emit('steplog', 'hi!');
     this.board[x + 'x' + y] = this.getTurn(user);
     this.turn = (user != this.user ? 'X' : 'O');
     this.steps++;
-    this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
+    // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
     cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user));
 }
 
@@ -98,7 +99,7 @@ Minesweeper.prototype.start = function(user, cb) {
         this.users[user] = id;
         this.users[opponent] = id;
         //console.dir(this.games[id]);
-        game.emit('timer', 'start', user);
+        // game.emit('timer', 'start', user);
         cb(true, id, opponent, this.x, this.y);
     } else {
         // Пока нет, значит будем ждать

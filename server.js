@@ -54,6 +54,7 @@ io.on('connection', function(socket) {
   }
 
   // setInterval(function() {
+  //   console.log('=========================================');
   //   console.log(Game);
   // }, 5000);
 
@@ -121,17 +122,17 @@ io.on('connection', function(socket) {
     // console.log(Game);
   });
 
-  socket.on('step', function (gameId, id) {
-    console.log('stepp gameId: ' + gameId + ' id: ' + id);
+  socket.on('step', function (gameId, id, tmp) {
+    console.log('stepp gameId: ' + gameId + ' id: ' + id + ' tmp: ' + tmp);
     // console.log('Game.games[gameId] === undefined' + Game.games[gameId] === undefined + '');
     if(Game.games[gameId] === undefined) return;
     // Парсим из ID элемента координаты XxY
     console.log('serverstep2');
     var coordinates = id.split('x');
     Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), function(win, turn) {
-      console.log('io.sockets.in(gameId)');
-      console.log(io.sockets.in(gameId));
-        io.sockets.in(gameId).emit('step', id, turn, win);
+      // console.log('io.sockets.in(gameId)');
+      // console.log(io.sockets.in(gameId));
+        io.sockets.in(gameId).emit('step', id, tmp, win);
         if(win) {
             Game.end(socket.id.toString(), function(gameId, opponent){
                 closeRoom(gameId, opponent);

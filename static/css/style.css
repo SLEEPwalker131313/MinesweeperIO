@@ -31,3 +31,7 @@ body{
 #board-table{
   border: 3px;
 }
+
+#open{
+  background-color: red;
+}

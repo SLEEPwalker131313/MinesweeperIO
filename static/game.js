@@ -98,8 +98,32 @@ var Minesweeper = {
                 Minesweeper.startGame(gameId, turn, x, y);
                 console.log(turn);
                 $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
+
+                // Обязательно зарефакторить
+                var tmp = 'Open';
+                $('#mine-flag').click(function(){
+                  tmp = $('#mine-flag').text();
+                  $('#current-symbol').html(tmp);
+                  $('#mine-flag').css('background-color', 'red');
+                  $('#open').css('background-color', 'white');
+                });
+                $('#open').click(function(){
+                  tmp = $('#open').text();
+                  $('#current-symbol').html(tmp);
+                  $('#open').css('background-color', 'red');
+                  $('#mine-flag').css('background-color', 'white');
+                });
+                // console.log(socket.id);
+                // var socket.id('ls') = 1;
+                // console.log(socket.id[tmp]);
+                // console.log($('#current-symbol').text());
+                // var tmp = $('#current-symbol').text();
+                // console.log(tmp);
                 $("#board-table td").click(function (e) {
-                    if(Minesweeper.i) socket.emit('step', Minesweeper.gameId, e.target.id);
+                  // console.log('tmp2 ' + tmp2);
+                  // console.log('tmp ' + tmp);
+                  // console.log('$("#current-symbol").text() ' + $('#current-symbol').text());
+                    if(Minesweeper.i) socket.emit('step', Minesweeper.gameId, e.target.id, tmp);      //за начальными символами сюда.
                 }).hover(function(){
                     $(this).toggleClass('ui-state-hover');
                 }, function(){
@@ -121,6 +145,10 @@ var Minesweeper = {
                     stats.prepend($('<div/>').attr('class', 'ui-state-hover ui-corner-all').html(arr[val]));
                 }
             });
+
+            socket.on('socketlog', function(data){
+              console.log(data);
+            })
         });
     },
 
@@ -137,6 +165,7 @@ var Minesweeper = {
             table.append(tr);
         }
         $("#board,#timerpanel").show();
+        $('#current-symbol').html(this.turn);
         // this.mask(!this.i);
     },
 
