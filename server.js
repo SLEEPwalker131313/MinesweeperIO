@@ -19,12 +19,7 @@ var Minesweeper = require('./models/game.js');
 var countGames = 0, countPlayers = [],  Game = new Minesweeper();
 
 setInterval(function() {
-    io.sockets.emit('stats', [
-        'Всего игр: ' + countGames,
-        'Уникальных игроков: ' + Object.keys(countPlayers).length,
-        'Сейчас игр: ' + Object.keys(Game.games).length,
-        'Сейчас игроков: ' + Object.keys(Game.users).length
-    ]);
+    gameStats();
     // console.log(Game.users);
     // console.log(Game.users[0]);
     // io.sockets.emit('user_list', 'hi');
@@ -43,19 +38,20 @@ server.listen(PORT, function() {
 
 
 io.on('connection', function(socket) {
-  socket.on('new-player', function(data, callback) {
-    console.log(data.name + ' user connected');
-    Game.users[socket.id] = data.name;
+  gameStats();
+  // socket.on('new-player', function(data, callback) {
+  //   console.log(data.name + ' user connected');
+  //   Game.users[socket.id] = data.name;
+  //
+  //   // socket.emit('socket_log', io.sockets);
+  //   console.log(io.sockets.sockets[socket.id].id);
+  // });
 
-    // socket.emit('socket_log', io.sockets);
-    console.log(io.sockets.sockets[socket.id].id);
-  });
-
-  // function closeRoom(gameId, opponent) {
-  //   socket.leave(gameId);
-  //   io.sockets.socket(opponent).leave(gameId);
-  //   countGames--;
-  // }
+  function closeRoom(gameId, opponent) {
+    socket.leave(gameId);
+    io.sockets.sockets[opponent].leave(gameId);
+    countGames--;
+  }
 
   // setInterval(function() {
   //   console.log(Game);
@@ -66,6 +62,8 @@ io.on('connection', function(socket) {
     console.log('start');
     console.log('start');
     console.log('start');
+    console.log('User with md5 ' + socket.id + ' expects the opponent to start the match');
+    Game.users[socket.id] = true;
     // if(Game.users[socket.id] !== undefined) {
     //   console.log('if(Game.users[socket.id] !== undefined)');
     //   return;
@@ -94,6 +92,7 @@ io.on('connection', function(socket) {
             io.sockets.sockets[socket.id].emit('wait');
 
         }
+        gameStats();
         console.log(Game);
     });
 
@@ -148,3 +147,13 @@ io.on('connection', function(socket) {
   });
 
 });
+
+
+function gameStats(){
+  io.sockets.emit('stats', [
+      'Всего игр: ' + countGames,
+      'Уникальных игроков: ' + Object.keys(countPlayers).length,
+      'Сейчас игр: ' + Object.keys(Game.games).length,
+      'Сейчас игроков: ' + Object.keys(Game.users).length
+  ]);
+}

@@ -14,31 +14,34 @@ var Minesweeper = {
             // });
 
             //реакция на нажатие кнопки ввода имени
-            $('#name-input').focus();
-              function send_name() {
-                var name = $('#name-input').val();
-                if (name && name.length < 20) {
-                  socket.emit('new-player', {
-                    name: name
-                  });
-                  //START
-                  socket.emit('start');
-
-                } else {
-                  window.alert('Your name cannot be blank or over 20 characters.');
-                }
-                //говнокод.
-                $('#main-block').css('display', 'block');
-                // $('#status').css('display', 'block');
-                $('#leaderboard').css('display', 'block');
-                $('.name').html(name);
-                $('#name-form').css('display', 'none');
-                //run after btn press
-                // socket.emit('start');
-                return false;
-            };
-            $('#name-form').submit(send_name);
-            $('#name-submit').click(send_name);
+            // $('#name-input').focus();
+            //   function send_name() {
+            //     var name = $('#name-input').val();
+            //     if (name && name.length < 20) {
+            //       socket.emit('new-player', {
+            //         name: name
+            //       });
+            //       //START
+            //       socket.emit('start');
+            //
+            //     } else {
+            //       window.alert('Your name cannot be blank or over 20 characters.');
+            //     }
+            //     //говнокод.
+            //     $('#main-block').css('display', 'block');
+            //     // $('#status').css('display', 'block');
+            //     $('#leaderboard').css('display', 'block');
+            //     $('.name').html(name);
+            //     $('#name-form').css('display', 'none');
+            //     //run after btn press
+            //     // socket.emit('start');
+            //     return false;
+            // };
+            // $('#name-form').submit(send_name);
+            $('#start-game').click(function() {
+              $('#start-game').hide();
+              socket.emit('start');
+            });
 
               ////////////////////////////////////////////
 
@@ -179,18 +182,20 @@ var Minesweeper = {
             case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
             default: text = 'Вы ' + (this.i ? 'проиграли! =(' : 'выиграли! =)');
         }
-        $("<div/>").html(text).dialog({
-            title: 'Конец игры',
-            modal: true,
-            closeOnEscape: false,
-            resizable: false,
-            buttons: { "Играть по новой": function() {
-                $(this).dialog("close");
-                window.location.reload();
-            }},
-            close: function() {
-                window.location.reload();
-            }
-        });
+        $('#result').html(text);
+        window.location.reload();
+        // $("<div/>").html(text).dialog({
+        //     title: 'Конец игры',
+        //     modal: true,
+        //     closeOnEscape: false,
+        //     resizable: false,
+        //     buttons: { "Играть по новой": function() {
+        //         $(this).dialog("close");
+        //         window.location.reload();
+        //     }},
+        //     close: function() {
+        //         window.location.reload();
+        //     }
+        // });
     }
 };
