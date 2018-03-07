@@ -10,8 +10,8 @@ var Minesweeper = module.exports = function() {
     // Массив пользователей ожидающих оппонентов для начало игры
     this.free = [];
     // Размеры поля
-    this.x = 30;
-    this.y = 16;
+    this.x = 16;
+    this.y = 30;
     // Шагов до победы
     this.numberOfMines = 99;
     // this.stepsToWin = 4;
@@ -62,9 +62,14 @@ GameItem.prototype.step = function(x, y, user, cb) {
   console.log('models.step');
     if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
+    // console.log(this.field);
+    // console.log('x: ' + x + ' y: ' + y);
+    console.log(this.field[x + 'x' + y]);
+    console.log('field: ' + this.field[x + 'x' + y]);
+    if(this.field[x + 'x' + y] === true){
+      console.log('boom! ' + user);
+    }
 
-    // this.emit('timer', 'stop');
-    this.emit('steplog', 'hi!');
     this.board[x + 'x' + y] = this.getTurn(user);
     this.turn = (user != this.user ? 'X' : 'O');
     this.steps++;
@@ -93,12 +98,10 @@ Minesweeper.prototype.start = function(user, cb) {
           return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        getRandomInRange(1, 10)
-
         var field1 = [];
         console.log('start!!!');
-        for (var rows = 0; rows < this.x; rows++) {
-          for (var cols = 0; cols < this.y; cols++){
+        for (var rows = 1; rows <= this.x; rows++) {
+          for (var cols = 1; cols <= this.y; cols++){
             field1[rows+'x'+cols] = false;
           }
         }
@@ -108,13 +111,15 @@ Minesweeper.prototype.start = function(user, cb) {
         var mines = 0;
         var irow, icol;
         while(mines < 99) {
-          irow = getRandomInRange(0, 29);
-          icol = getRandomInRange(0, 15);
+          irow = getRandomInRange(1, 16);
+          icol = getRandomInRange(1, 30);
           if(field1[irow+'x'+icol] == false){
             field1[irow+'x'+icol] = true;
             ++mines;
           }
         }
+
+        console.log(field1);
         // console.log(field1);
 
         var game = new GameItem(user, opponent, this.x, this.y, this.stepsToWin, field1);

@@ -171,10 +171,10 @@ var Minesweeper = {
         // console.log(field);
         var count = 0;
         var table = $('#board-table').empty();
-        for(var i = 1; i <= y; i++) {
+        for(var i = 1; i <= x; i++) {
             var tr = $('<tr/>');
-            for(var j = 0; j < x; j++) {
-                tr.append($('<td/>').attr('id', (j+1) + 'x' + i).addClass('ui-state-default').html(field[count++]));
+            for(var j = 1; j <= y; j++) {
+                tr.append($('<td/>').attr('id', i + 'x' + j).addClass('ui-state-default').html(field[count++]));
             }
             table.append(tr);
         }
