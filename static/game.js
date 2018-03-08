@@ -103,7 +103,7 @@ var Minesweeper = {
                 // console.log('field1 ' + field1);
                 Minesweeper.startGame(gameId, turn, x, y, field);
                 console.log(turn);
-                $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
+                // $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
 
                 // Обязательно зарефакторить
                 var tmp = 'Open';
@@ -150,6 +150,14 @@ var Minesweeper = {
                 Minesweeper.move(id, turn, win, myChange);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
+
+            socket.on('findMine', function(id, turn, win, myChange) {
+                //console.info('step', id, turn, win);
+                console.log(myChange);
+                Minesweeper.findMine(id, turn, win, myChange);
+                // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
+            });
+
             // Статистика
             socket.on('stats', function (arr) {
                 var stats = $('#stats');
@@ -214,14 +222,14 @@ var Minesweeper = {
         console.log('move');
         console.log(id);
         console.log(turn);
-        function drowChenge(id, changeClass){
+        function drowChange(id, changeClass){
           for(arr in id){
             $("#" + id[arr]).attr('class', changeClass);
           }
         }
 
         var changeClass = (myChange) ? 'ui-state-user' : 'ui-state-opponent';
-        drowChenge(id, changeClass);
+        drowChange(id, changeClass);
         var openUserVal = parseInt($('#openUser').text());
         var openOpponentVal = parseInt($('#openOpponent').text());
         // console.log('openUserVal' + openUserVal);
@@ -229,6 +237,37 @@ var Minesweeper = {
           $('#openUser').html(openUserVal + id.length);
         } else {
           $('#openOpponent').html(openOpponentVal + id.length);
+        }
+
+        this.i = (turn != this.turn);
+        // $("#" + id).attr('class', 'ui-state-hover').html(turn);
+        if (!win) {
+            // this.mask(!this.i);
+            $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
+        } else {
+            this.endGame(turn, win);
+        }
+    },
+
+    findMine: function (id, turn, win, myChange) {
+        // console.log('move');
+        console.log(id);
+        // console.log(turn);
+        function drowChangeFindMine(id, changeClass){
+          console.log('foo');
+            $("#" + id).attr('class', changeClass).html('flag');
+        }
+
+        var changeClass = (myChange) ? 'ui-state-user' : 'ui-state-opponent';
+        drowChangeFindMine(id, changeClass);
+
+        var findUserVal = parseInt($('#findUser').text());
+        var findOpponentVal = parseInt($('#findOpponent').text());
+        // console.log('openUserVal' + openUserVal);
+        if(myChange) {
+          $('#findUser').html(findUserVal + id.length);
+        } else {
+          $('#findOpponent').html(findOpponentVal + id.length);
         }
 
         this.i = (turn != this.turn);

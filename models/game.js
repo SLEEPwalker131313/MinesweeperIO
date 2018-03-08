@@ -64,10 +64,17 @@ util.inherits(GameItem, EventEmitter);
 /**
  * Сделан ход
  */
-GameItem.prototype.step = function(x, y, user, cb) {
+GameItem.prototype.step = function(x, y, user, symbol, cb) {
   console.log('models.step');
     if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
+    console.log(symbol);
+    if(symbol == 'Mine Flag'){
+      console.log('mine flag');
+      //check  dynamic board
+      cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), x+'x'+y, true);
+
+    } else {
     // console.log(this);
     // console.log(user);
     // console.log(GameItem);
@@ -115,13 +122,14 @@ GameItem.prototype.step = function(x, y, user, cb) {
     this.steps++;
     console.log(openFieldPart);
     // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
-    cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), openFieldPart);
+    cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), openFieldPart, false);
+  }
 }
 
-Minesweeper.prototype.step = function(gameId, x, y, user, cb) {
+Minesweeper.prototype.step = function(gameId, x, y, user, symbol, cb) {
     //console.info('Step');
     //console.dir(this.games[gameId]);
-    this.games[gameId].step(x, y, user, cb);
+    this.games[gameId].step(x, y, user, symbol, cb);
 }
 
 /**
