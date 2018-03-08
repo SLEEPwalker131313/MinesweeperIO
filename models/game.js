@@ -38,6 +38,12 @@ var GameItem = function(user, opponent, x, y, numberOfMines, field1) {
     this.steps = 0;
     // Кто ходит
     this.turn = 'X';
+
+    this.openUser = 0;
+    this.openOpponent = 0;
+
+    this.findUser = 0;
+    this.findOpponent = 0;
     // Таймер хода
     // this.timeout = null;
     // Запускаем таймер
@@ -62,6 +68,9 @@ GameItem.prototype.step = function(x, y, user, cb) {
   console.log('models.step');
     if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
+    // console.log(this);
+    // console.log(user);
+    // console.log(GameItem);
     // console.log(this.field);
     // console.log('x: ' + x + ' y: ' + y);
     var openFieldPart = [];
@@ -90,6 +99,15 @@ GameItem.prototype.step = function(x, y, user, cb) {
       console.log('boom! ' + user);
     } else{
       logNearSpace(this.field, x, y, this.x, this.y);
+    }
+
+    console.log('user');
+    console.log(this.user);
+    console.log(openFieldPart.length);
+    if(user == this.user){
+      this.openUser += openFieldPart.length;
+    } else {
+      this.openOpponent += openFieldPart.length;
     }
 
     this.board[x + 'x' + y] = this.getTurn(user);

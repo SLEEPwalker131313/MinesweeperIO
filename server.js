@@ -146,7 +146,14 @@ io.on('connection', function(socket) {
       // console.log('io.sockets.in(gameId)');
       // console.log(io.sockets.in(gameId));
         // io.sockets.in(gameId).emit('step', id, tmp, win);
-        io.sockets.in(gameId).emit('step', openFieldPart, tmp, win);  //каким-то образом массив открытого получить и передать тут
+        // console.log('this');
+        // console.log(Game.games[gameId]);
+        // console.log(socket.id);
+        // console.log(Game.games[gameId].user);
+        // console.log(Game.games[gameId].user === socket.id);
+        // io.sockets.in(gameId).emit('step', openFieldPart, tmp, win, socket.id);  //каким-то образом массив открытого получить и передать тут
+        io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, tmp, win, Game.games[gameId].user === socket.id );  //каким-то образом массив открытого получить и передать тут
+        io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, tmp, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
 
         if(win) {
             Game.end(socket.id.toString(), function(gameId, opponent){

@@ -131,6 +131,10 @@ var Minesweeper = {
                   // console.log('$("#current-symbol").text() ' + $('#current-symbol').text());
                   // console.log(Minesweeper);
                   // console.log(GameItem);
+                  // console.log('socket.id');
+                  // console.log(socket.id);
+                    // console.log('i');
+                    // console.log(Minesweeper.i);
                     if(Minesweeper.i) socket.emit('step', Minesweeper.gameId, e.target.id, tmp);      //за начальными символами сюда.
                 }).hover(function(){
                     $(this).toggleClass('ui-state-hover');
@@ -140,9 +144,10 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Start', gameId]);
             });
             // Получаем ход
-            socket.on('step', function(id, turn, win) {
+            socket.on('step', function(id, turn, win, myChange) {
                 //console.info('step', id, turn, win);
-                Minesweeper.move(id, turn, win);
+                console.log(myChange);
+                Minesweeper.move(id, turn, win, myChange);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
             // Статистика
@@ -205,14 +210,27 @@ var Minesweeper = {
     //     }
     // },
 
-    move: function (id, turn, win) {
-      console.log('move');
-      console.log(id);
-      for(arr in id){
-        console.log(arr);
-        console.log(id[arr]);
-        $("#" + id[arr]).attr('class', 'ui-state-hover');
-      }
+    move: function (id, turn, win, myChange) {
+        console.log('move');
+        console.log(id);
+        console.log(turn);
+        function drowChenge(id, changeClass){
+          for(arr in id){
+            $("#" + id[arr]).attr('class', changeClass);
+          }
+        }
+
+        var changeClass = (myChange) ? 'ui-state-user' : 'ui-state-opponent';
+        drowChenge(id, changeClass);
+        var openUserVal = parseInt($('#openUser').text());
+        var openOpponentVal = parseInt($('#openOpponent').text());
+        // console.log('openUserVal' + openUserVal);
+        if(myChange) {
+          $('#openUser').html(openUserVal + id.length);
+        } else {
+          $('#openOpponent').html(openOpponentVal + id.length);
+        }
+
         this.i = (turn != this.turn);
         // $("#" + id).attr('class', 'ui-state-hover').html(turn);
         if (!win) {

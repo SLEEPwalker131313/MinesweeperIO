@@ -28,6 +28,14 @@ body{
   background-color: yellow;
 }
 
+.ui-state-user{
+  background-color: red;
+}
+
+.ui-state-opponent{
+  background-color: green;
+}
+
 #board-table{
   border: 3px;
 }
