@@ -64,21 +64,23 @@ GameItem.prototype.step = function(x, y, user, cb) {
     console.log('models.step2');
     // console.log(this.field);
     // console.log('x: ' + x + ' y: ' + y);
-    var tmp = [];
+    var openFieldPart = [];
 
     function logNearSpace(field1, x, y, maxx, maxy){
-      if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && field1[x+'x'+y] === 0 && tmp.indexOf(x+'x'+y) == -1){
-        tmp.push(x+'x'+y);
+      if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && field1[x+'x'+y] === 0 && openFieldPart.indexOf(x+'x'+y) == -1){
+        openFieldPart.push(x+'x'+y);
         console.log('x: ' + x + ' y: ' + y);
-        // logNearSpace(field1, x - 1, y - 1, maxx, maxy);
         logNearSpace(field1, x - 1, y, maxx, maxy);
-        // logNearSpace(field1, x - 1, y + 1, maxx, maxy);
         logNearSpace(field1, x, y - 1, maxx, maxy);
         logNearSpace(field1, x, y + 1, maxx, maxy);
-        // logNearSpace(field1, x + 1, y - 1, maxx, maxy);
         logNearSpace(field1, x + 1, y, maxx, maxy);
-        // logNearSpace(field1, x + 1, y + 1, maxx, maxy);
       } else {
+          if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && openFieldPart.indexOf(x+'x'+y) == -1){
+            openFieldPart.push(x+'x'+y);
+            console.log('elselog');
+            console.log('x: ' + x + ' y: ' + y);
+          }
+
         return;
       }
     }
@@ -93,8 +95,9 @@ GameItem.prototype.step = function(x, y, user, cb) {
     this.board[x + 'x' + y] = this.getTurn(user);
     this.turn = (user != this.user ? 'X' : 'O');
     this.steps++;
+    console.log(openFieldPart);
     // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
-    cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user));
+    cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), openFieldPart);
 }
 
 Minesweeper.prototype.step = function(gameId, x, y, user, cb) {

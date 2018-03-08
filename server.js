@@ -142,10 +142,12 @@ io.on('connection', function(socket) {
     // Парсим из ID элемента координаты XxY
     console.log('serverstep2');
     var coordinates = id.split('x');
-    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), function(win, turn) {
+    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), function(win, turn, openFieldPart) {
       // console.log('io.sockets.in(gameId)');
       // console.log(io.sockets.in(gameId));
-        io.sockets.in(gameId).emit('step', id, tmp, win);
+        // io.sockets.in(gameId).emit('step', id, tmp, win);
+        io.sockets.in(gameId).emit('step', openFieldPart, tmp, win);  //каким-то образом массив открытого получить и передать тут
+
         if(win) {
             Game.end(socket.id.toString(), function(gameId, opponent){
                 closeRoom(gameId, opponent);

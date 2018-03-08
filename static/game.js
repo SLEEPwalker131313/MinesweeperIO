@@ -206,8 +206,15 @@ var Minesweeper = {
     // },
 
     move: function (id, turn, win) {
+      console.log('move');
+      console.log(id);
+      for(arr in id){
+        console.log(arr);
+        console.log(id[arr]);
+        $("#" + id[arr]).attr('class', 'ui-state-hover');
+      }
         this.i = (turn != this.turn);
-        $("#" + id).attr('class', 'ui-state-hover').html(turn);
+        // $("#" + id).attr('class', 'ui-state-hover').html(turn);
         if (!win) {
             // this.mask(!this.i);
             $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
