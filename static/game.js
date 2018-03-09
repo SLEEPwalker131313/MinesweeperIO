@@ -255,7 +255,12 @@ var Minesweeper = {
         // console.log(turn);
         function drowChangeFindMine(id, changeClass){
           console.log('foo');
+          if($("#" + id).text() == 'flag'){
+            console.log('already');
+            $("#" + id).attr('class','ui-state-default').html('');    //На текст пофиг, в конце ведь не будет, а стиль дефолтный.
+          } else {
             $("#" + id).attr('class', changeClass).html('flag');
+          }
         }
 
         var changeClass = (myChange) ? 'ui-state-user' : 'ui-state-opponent';

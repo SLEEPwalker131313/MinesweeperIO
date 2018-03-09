@@ -18,11 +18,11 @@ var Minesweeper = module.exports = function() {
 }
 util.inherits(Minesweeper, EventEmitter);
 
-var GameItem = function(user, opponent, x, y, numberOfMines, field1) {
+var GameItem = function(user, opponent, x, y, numberOfMines, field1, board) {
     // Инициализируем события
     EventEmitter.call(this);
     // Ячейки игрового поля
-    this.board = [];
+    this.board = board;
     this.field = field1;
     // Игроки
     this.user = user; // X
@@ -66,15 +66,42 @@ util.inherits(GameItem, EventEmitter);
  */
 GameItem.prototype.step = function(x, y, user, symbol, cb) {
   console.log('models.step');
-    if(this.board[x + 'x' + y] !== undefined) return;
+    // if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
     console.log(symbol);
     if(symbol == 'Mine Flag'){
       console.log('mine flag');
       //check  dynamic board
-      cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), x+'x'+y, true);
+      console.log(this.board[x+'x'+y]);
+      if(this.board[x+'x'+y] == false){
+        this.board[x+'x'+y] = user+'findmine';
+        cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), x+'x'+y, true);
+      } else if(this.board[x+'x'+y].indexOf('find') != -1){
+        this.board[x+'x'+y] = false;
+        cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), x+'x'+y, true)
+      } else{
+        return;
+      }
+      // if(this.board[x+'x'+y] != false) {
+      //   console.log('boarditem');
+      //   console.log(this.board[x+'x'+y]);
+      //   console.log(this.board[x+'x'+y].indexOf('open'));
+      //   console.log(this.board[x+'x'+y].indexOf('find'));
+      //   return;
+      // }
+
 
     } else {
+      console.log('nonmine');
+      console.log(this.board[x+'x'+y]);
+      if(this.board[x+'x'+y]!= false){
+        if(this.board[x+'x'+y].indexOf('find') != -1 ){
+          return;
+        }
+        if(this.board[x+'x'+y].indexOf('open') != -1){ //изменить, ибо надо обработать штуку быстрого открытия поля
+          return;
+        }
+      }
     // console.log(this);
     // console.log(user);
     // console.log(GameItem);
@@ -117,7 +144,12 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
       this.openOpponent += openFieldPart.length;
     }
 
-    this.board[x + 'x' + y] = this.getTurn(user);
+    this.board[x+'x'+y] = user+'openmine';
+    for(arr in openFieldPart){
+      this.board[openFieldPart[arr]] = user+'openmine';
+    }
+
+    // this.board[x + 'x' + y] = user;
     this.turn = (user != this.user ? 'X' : 'O');
     this.steps++;
     console.log(openFieldPart);
@@ -148,10 +180,11 @@ Minesweeper.prototype.start = function(user, cb) {
         }
 
         var field1 = [];
+        var board = [];
         console.log('start!!!');
         for (var rows = 1; rows <= this.x; rows++) {
           for (var cols = 1; cols <= this.y; cols++){
-            field1[rows+'x'+cols] = false;
+            field1[rows+'x'+cols] = board[rows+'x'+cols] = false;
           }
         }
 
@@ -200,7 +233,7 @@ Minesweeper.prototype.start = function(user, cb) {
         console.log(field1);
         // console.log(field1);
 
-        var game = new GameItem(user, opponent, this.x, this.y, this.stepsToWin, field1);
+        var game = new GameItem(user, opponent, this.x, this.y, this.stepsToWin, field1, board);
         var id = [
             Math.random() * 0xffff | 0
             , Math.random() * 0xffff | 0
