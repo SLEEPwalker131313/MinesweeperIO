@@ -172,14 +172,18 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
         //check  dynamic board
         console.log(this.board[x+'x'+y]);
         this.openFieldPart = [];
+        var flagIsYours = true;
         if(this.board[x+'x'+y] == false){
           this.board[x+'x'+y] = user+'findmine';
           this.openFieldPart.push(x+'x'+y);
-          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, false);
+          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, false, flagIsYours);
         } else if(this.board[x+'x'+y].indexOf('find') != -1){
           this.openFieldPart.push(x+'x'+y);
+          console.log(this.board[x+'x'+y].indexOf(user));
+          flagIsYours = (this.board[x+'x'+y].indexOf(user) != -1);
+          // console.log('flagIsYours ' + flagIsYours);
           this.board[x+'x'+y] = false;
-          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, true)
+          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, true, flagIsYours)
         } else{
           return;
         }

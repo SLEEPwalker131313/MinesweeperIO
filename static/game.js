@@ -151,10 +151,10 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
-            socket.on('findMine', function(id, turn, win, myChange, alreadyChecked) {
+            socket.on('findMine', function(id, turn, win, myChange, alreadyChecked, flagIsYours) {
                 //console.info('step', id, turn, win);
                 console.log(myChange);
-                Minesweeper.findMine(id, turn, win, myChange, alreadyChecked);
+                Minesweeper.findMine(id, turn, win, myChange, alreadyChecked, flagIsYours);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
@@ -249,7 +249,7 @@ var Minesweeper = {
         }
     },
 
-    findMine: function (id, turn, win, myChange, alreadyChecked) {
+    findMine: function (id, turn, win, myChange, alreadyChecked, flagIsYours) {
         // console.log('move');
         console.log(id);
         // console.log(turn);
@@ -273,12 +273,22 @@ var Minesweeper = {
         var findOpponentVal = parseInt($('#findOpponent').text());
         // console.log('openUserVal' + openUserVal);
 
-        // var valChange = (alreadyChecked) ? -1:1;
-        var valChange = 1;
-        if(myChange) {
-          $('#findUser').html(findUserVal + valChange);
+        var valChange = (alreadyChecked) ? -1:1;
+        // var valChange = 1;
+        if(alreadyChecked){
+          if(flagIsYours){
+            $('#findUser').html(findUserVal + valChange);
+
+          } else {
+            $('#findOpponent').html(findOpponentVal + valChange);
+
+          }
         } else {
-          $('#findOpponent').html(findOpponentVal + valChange);
+          if(myChange) {
+            $('#findUser').html(findUserVal + valChange);
+          } else {
+            $('#findOpponent').html(findOpponentVal + valChange);
+          }
         }
 
         this.i = (turn != this.turn);
