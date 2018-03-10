@@ -142,7 +142,7 @@ io.on('connection', function(socket) {
     // Парсим из ID элемента координаты XxY
     console.log('serverstep2');
     var coordinates = id.split('x');
-    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), tmp, function(win, turn, openFieldPart, mineFlag) {
+    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), tmp, function(win, turn, openFieldPart, mineFlag, alreadyChecked) {
       // console.log('io.sockets.in(gameId)');
       // console.log(io.sockets.in(gameId));
         // io.sockets.in(gameId).emit('step', id, tmp, win);
@@ -154,10 +154,10 @@ io.on('connection', function(socket) {
         // io.sockets.in(gameId).emit('step', openFieldPart, tmp, win, socket.id);  //каким-то образом массив открытого получить и передать тут
         if(mineFlag){
           console.log('find mine at ' + openFieldPart);
-          io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, tmp, win, Game.games[gameId].user === socket.id );
-          io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, tmp, win, Game.games[gameId].opponent === socket.id);
+          io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, tmp, win, Game.games[gameId].user === socket.id, alreadyChecked );
+          io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, tmp, win, Game.games[gameId].opponent === socket.id, alreadyChecked );
         } else{
-          io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, tmp, win, Game.games[gameId].user === socket.id );  //каким-то образом массив открытого получить и передать тут
+          io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, tmp, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
           io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, tmp, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
 
           if(win) {

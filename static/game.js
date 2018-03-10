@@ -151,10 +151,10 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
-            socket.on('findMine', function(id, turn, win, myChange) {
+            socket.on('findMine', function(id, turn, win, myChange, alreadyChecked) {
                 //console.info('step', id, turn, win);
                 console.log(myChange);
-                Minesweeper.findMine(id, turn, win, myChange);
+                Minesweeper.findMine(id, turn, win, myChange, alreadyChecked);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
@@ -249,7 +249,7 @@ var Minesweeper = {
         }
     },
 
-    findMine: function (id, turn, win, myChange) {
+    findMine: function (id, turn, win, myChange, alreadyChecked) {
         // console.log('move');
         console.log(id);
         // console.log(turn);
@@ -258,10 +258,13 @@ var Minesweeper = {
           if($("#" + id).text() == 'flag'){
             console.log('already');
             $("#" + id).attr('class','ui-state-default').html('');    //На текст пофиг, в конце ведь не будет, а стиль дефолтный.
+
           } else {
             $("#" + id).attr('class', changeClass).html('flag');
           }
         }
+        console.log(id);
+        console.log(id.length);
 
         var changeClass = (myChange) ? 'ui-state-user' : 'ui-state-opponent';
         drowChangeFindMine(id, changeClass);
@@ -269,10 +272,13 @@ var Minesweeper = {
         var findUserVal = parseInt($('#findUser').text());
         var findOpponentVal = parseInt($('#findOpponent').text());
         // console.log('openUserVal' + openUserVal);
+
+        // var valChange = (alreadyChecked) ? -1:1;
+        var valChange = 1;
         if(myChange) {
-          $('#findUser').html(findUserVal + id.length);
+          $('#findUser').html(findUserVal + valChange);
         } else {
-          $('#findOpponent').html(findOpponentVal + id.length);
+          $('#findOpponent').html(findOpponentVal + valChange);
         }
 
         this.i = (turn != this.turn);

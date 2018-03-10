@@ -39,6 +39,8 @@ var GameItem = function(user, opponent, x, y, numberOfMines, field1, board) {
     // Кто ходит
     this.turn = 'X';
 
+    this.openFieldPart = [];
+
     this.openUser = 0;
     this.openOpponent = 0;
 
@@ -61,6 +63,60 @@ var GameItem = function(user, opponent, x, y, numberOfMines, field1, board) {
 }
 util.inherits(GameItem, EventEmitter);
 
+
+GameItem.prototype.mineAt = function (x, y) {
+  if(y >= 1 && y <= this.y && x >= 1 && x <= this.x
+    && this.board[x+'x'+y].toString().indexOf('find') != -1) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+GameItem.prototype.nearMinesFind = function(x, y){
+  var mines = 0;
+  mines += this.mineAt(x - 1, y - 1);
+  mines += this.mineAt(x - 1, y);
+  mines += this.mineAt(x - 1, y + 1);
+  mines += this.mineAt(x, y - 1);
+  mines += this.mineAt(x, y + 1);
+  mines += this.mineAt(x + 1, y - 1);
+  mines += this.mineAt(x + 1, y);
+  mines += this.mineAt(x + 1, y + 1);
+  return mines;
+}
+
+GameItem.prototype.logNearSpace = function (x, y){
+  if(y >= 1 && y <= this.y && x >= 1 && x <= this.x
+    && this.field[x+'x'+y] === 0 && this.openFieldPart.indexOf(x+'x'+y) == -1
+    && this.board[x+'x'+y].toString().indexOf('open') == -1){
+    // console.log(Minesweeper.games);
+    // console.log('this');
+    // console.log(this);
+    if(this.board[x+'x'+y].toString().indexOf('find') == -1)
+      this.openFieldPart.push(x+'x'+y);
+    console.log('x: ' + x + ' y: ' + y);
+    this.logNearSpace(x - 1, y - 1);
+    this.logNearSpace(x + 1, y - 1);
+    this.logNearSpace(x - 1, y + 1);
+    this.logNearSpace(x + 1, y + 1);
+    this.logNearSpace(x - 1, y);
+    this.logNearSpace(x, y - 1);
+    this.logNearSpace(x, y + 1);
+    this.logNearSpace(x + 1, y);
+  } else {
+      if(y >= 1 && y <= this.y && x >= 1 && x <= this.x
+        && this.openFieldPart.indexOf(x+'x'+y) == -1
+        && this.board[x+'x'+y].toString().indexOf('open') == -1){
+        if(this.board[x+'x'+y].toString().indexOf('find') == -1)
+          this.openFieldPart.push(x+'x'+y);
+        // console.log('elselog');
+        // console.log('x: ' + x + ' y: ' + y);
+      }
+    return;
+  }
+}
+
 /**
  * Сделан ход
  */
@@ -68,93 +124,125 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
   console.log('models.step');
     // if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
-    console.log(symbol);
-    if(symbol == 'Mine Flag'){
-      console.log('mine flag');
-      //check  dynamic board
-      console.log(this.board[x+'x'+y]);
-      if(this.board[x+'x'+y] == false){
-        this.board[x+'x'+y] = user+'findmine';
-        cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), x+'x'+y, true);
-      } else if(this.board[x+'x'+y].indexOf('find') != -1){
-        this.board[x+'x'+y] = false;
-        cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), x+'x'+y, true)
-      } else{
+    // console.log(symbol);
+    // console.log(this.board);
+    if(this.board[x+'x'+y].toString().indexOf('open') != -1){ //Smart oppening
+      console.log('smart');
+      // if(this.field[x+'x'])
+      console.log(this.field[x+'x'+y]);
+      if(this.field[x+'x'+y] == 0){
         return;
-      }
-      // if(this.board[x+'x'+y] != false) {
-      //   console.log('boarditem');
-      //   console.log(this.board[x+'x'+y]);
-      //   console.log(this.board[x+'x'+y].indexOf('open'));
-      //   console.log(this.board[x+'x'+y].indexOf('find'));
-      //   return;
-      // }
-
-
-    } else {
-      console.log('nonmine');
-      console.log(this.board[x+'x'+y]);
-      if(this.board[x+'x'+y]!= false){
-        if(this.board[x+'x'+y].indexOf('find') != -1 ){
-          return;
-        }
-        if(this.board[x+'x'+y].indexOf('open') != -1){ //изменить, ибо надо обработать штуку быстрого открытия поля
-          return;
-        }
-      }
-    // console.log(this);
-    // console.log(user);
-    // console.log(GameItem);
-    // console.log(this.field);
-    // console.log('x: ' + x + ' y: ' + y);
-    var openFieldPart = [];
-
-    function logNearSpace(field1, x, y, maxx, maxy){
-      if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && field1[x+'x'+y] === 0 && openFieldPart.indexOf(x+'x'+y) == -1){
-        openFieldPart.push(x+'x'+y);
-        console.log('x: ' + x + ' y: ' + y);
-        logNearSpace(field1, x - 1, y, maxx, maxy);
-        logNearSpace(field1, x, y - 1, maxx, maxy);
-        logNearSpace(field1, x, y + 1, maxx, maxy);
-        logNearSpace(field1, x + 1, y, maxx, maxy);
       } else {
-          if(y >= 1 && y <= maxy && x >= 1 && x <= maxx && openFieldPart.indexOf(x+'x'+y) == -1){
-            openFieldPart.push(x+'x'+y);
-            console.log('elselog');
-            console.log('x: ' + x + ' y: ' + y);
+        console.log(this.field[x+'x'+y]);
+        console.log(this.nearMinesFind(x, y));
+        if(this.nearMinesFind(x, y) == this.field[x+'x'+y]){ //вернуть ли если >=
+          console.log('correct');
+          this.openFieldPart = [];
+          this.logNearSpace(x - 1, y - 1);
+          this.logNearSpace(x - 1, y);
+          this.logNearSpace(x - 1, y + 1);
+          this.logNearSpace(x, y - 1);
+          this.logNearSpace(x, y + 1);
+          this.logNearSpace(x + 1, y - 1);
+          this.logNearSpace(x + 1, y);
+          this.logNearSpace(x + 1, y + 1);
+          // this.openFieldPart = [(x+1)+'x'+y, (x-1)+'x'+y, x+'x'+(y-1), x+'x'+(y+1)];
+          console.log('this.openFieldPart');
+          console.log(this.openFieldPart);
+
+          for(arr in this.openFieldPart){
+            console.log(this.field[this.openFieldPart[arr]]);
+            // console.log('nonmine');
+            // console.log(this.board[this.openFieldPart[arr]]);
+            if(this.field[this.openFieldPart[arr]].toString() == 'true'){
+              console.log('boom at ' + this.openFieldPart[arr]);
+              //end!!!!
+            }
+            this.board[this.openFieldPart[arr]] = user+'openmine';
           }
-
-        return;
+          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, false, false);
+          return;
+        } else {
+          return;
+        }
       }
-    }
-    console.log(this.field[x + 'x' + y]);
-    console.log('field: ' + this.field[x + 'x' + y]);
-    if(this.field[x + 'x' + y] === true){
-      console.log('boom! ' + user);
-    } else{
-      logNearSpace(this.field, x, y, this.x, this.y);
-    }
+    } else {  //Non-smart
+      if(symbol == 'Mine Flag'){  //Flag
+        console.log('mine flag');
+        //check  dynamic board
+        console.log(this.board[x+'x'+y]);
+        this.openFieldPart = [];
+        if(this.board[x+'x'+y] == false){
+          this.board[x+'x'+y] = user+'findmine';
+          this.openFieldPart.push(x+'x'+y);
+          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, false);
+        } else if(this.board[x+'x'+y].indexOf('find') != -1){
+          this.openFieldPart.push(x+'x'+y);
+          this.board[x+'x'+y] = false;
+          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, true)
+        } else{
+          return;
+        }
+        // if(this.board[x+'x'+y] != false) {
+        //   console.log('boarditem');
+        //   console.log(this.board[x+'x'+y]);
+        //   console.log(this.board[x+'x'+y].indexOf('open'));
+        //   console.log(this.board[x+'x'+y].indexOf('find'));
+        //   return;
+        // }
 
-    console.log('user');
-    console.log(this.user);
-    console.log(openFieldPart.length);
-    if(user == this.user){
-      this.openUser += openFieldPart.length;
-    } else {
-      this.openOpponent += openFieldPart.length;
-    }
 
-    this.board[x+'x'+y] = user+'openmine';
-    for(arr in openFieldPart){
-      this.board[openFieldPart[arr]] = user+'openmine';
-    }
+      } else {  //Open field
+        console.log('nonmine');
+        console.log(this.board[x+'x'+y]);
+        if(this.board[x+'x'+y]!= false){
+          if(this.board[x+'x'+y].indexOf('find') != -1 ){
+            return;
+          }
+          if(this.board[x+'x'+y].indexOf('open') != -1){ //изменить, ибо надо обработать штуку быстрого открытия поля
+            return;
+          }
+        }
+      // console.log(this);
+      // console.log(user);
+      // console.log(GameItem);
+      // console.log(this.field);
+      // console.log('x: ' + x + ' y: ' + y);
+      // var openFieldPart = [];
+      this.openFieldPart = [];
 
-    // this.board[x + 'x' + y] = user;
-    this.turn = (user != this.user ? 'X' : 'O');
-    this.steps++;
-    console.log(openFieldPart);
-    // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
-    cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), openFieldPart, false);
+
+      console.log(this.field[x + 'x' + y]);
+      console.log('field: ' + this.field[x + 'x' + y]);
+      if(this.field[x + 'x' + y] === true){
+        console.log('boom at ' + x + 'x' + y + ' by user '+ user);
+        //return with end flag
+      } else{
+        // logNearSpace(this.field, x, y, this);
+        this.logNearSpace(x, y);
+      }
+
+      console.log('user');
+      console.log(this.user);
+      console.log(this.openFieldPart.length);
+      if(user == this.user){
+        this.openUser += this.openFieldPart.length;
+      } else {
+        this.openOpponent += this.openFieldPart.length;
+      }
+
+      this.board[x+'x'+y] = user+'openmine';
+      for(arr in this.openFieldPart){
+        this.board[this.openFieldPart[arr]] = user+'openmine';
+      }
+
+      // this.board[x + 'x' + y] = user;
+      this.turn = (user != this.user ? 'X' : 'O');
+      this.steps++;
+      console.log(this.openFieldPart);
+      // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
+      cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, false, false);
+    }
   }
 }
 
