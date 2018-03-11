@@ -86,7 +86,7 @@ io.on('connection', function(socket) {
             console.log('ready gameId: ' + gameId + ' x: ' +x + ' y: ' + y);
             var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
 
-            socket.emit('ready', gameId, 'X', x, y, arr);
+            socket.emit('ready', gameId, x, y, arr);
             console.log('games');
             // console.log(Game.games[gameId].field['2x4']);
             // console.log(Object.keys(Game.games[gameId].field));
@@ -98,7 +98,7 @@ io.on('connection', function(socket) {
             // socket.emit('field', Game.games[gameId].field);
             // socket.emit('field', arr);
             console.log(arr);
-            io.sockets.sockets[opponent].emit('ready', gameId, 'O', x, y, arr);
+            io.sockets.sockets[opponent].emit('ready', gameId, x, y, arr);
             countGames++;
         } else {
             // ожидает аппонента
@@ -135,37 +135,55 @@ io.on('connection', function(socket) {
     // console.log(Game);
   });
 
-  socket.on('step', function (gameId, id, tmp) {
-    console.log('stepp gameId: ' + gameId + ' id: ' + id + ' tmp: ' + tmp);
+  socket.on('step', function (gameId, id, symbol) {
+    console.log('stepp gameId: ' + gameId + ' id: ' + id + ' symbol: ' + symbol);
     // console.log('Game.games[gameId] === undefined' + Game.games[gameId] === undefined + '');
     if(Game.games[gameId] === undefined) return;
     // Парсим из ID элемента координаты XxY
     console.log('serverstep2');
     var coordinates = id.split('x');
-    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), tmp, function(win, turn, openFieldPart, mineFlag, alreadyChecked, flagIsYours) {
+    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), symbol, function(win, openFieldPart, mineFlag, alreadyChecked, flagIsYours) {
       // console.log('io.sockets.in(gameId)');
       // console.log(io.sockets.in(gameId));
-        // io.sockets.in(gameId).emit('step', id, tmp, win);
+        // io.sockets.in(gameId).emit('step', id, symbol, win);
         // console.log('this');
         // console.log(Game.games[gameId]);
         // console.log(socket.id);
         // console.log(Game.games[gameId].user);
         // console.log(Game.games[gameId].user === socket.id);
         // io.sockets.in(gameId).emit('step', openFieldPart, tmp, win, socket.id);  //каким-то образом массив открытого получить и передать тут
-        if(mineFlag){
-          console.log('find mine at ' + openFieldPart);
-          io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, tmp, win, Game.games[gameId].user === socket.id, alreadyChecked, flagIsYours );
-          io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, tmp, win, Game.games[gameId].opponent === socket.id, alreadyChecked, flagIsYours );
-        } else{
-          io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, tmp, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
-          io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, tmp, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
+        // console.log('step win: ' + win);
+        // console.log('Game.games[gameId].user ' + Game.games[gameId].user);
+        // console.log('Game.games[gameId].user === socket.id ' + Game.games[gameId].opponent === socket.id);
+        // console.log('boom == boom: ');
+        // console.log(win == 'boom');
 
-          if(win) {
-              Game.end(socket.id.toString(), function(gameId, opponent){
-                  closeRoom(gameId, opponent);
-              });
+        if(win == 'none'){
+          // console.log('1');
+          // console.log('Game.games[gameId].opponent === socket.id ' + Game.games[gameId].opponent);
+          // console.log('Game.games[gameId].user === socket.id ' + Game.games[gameId].user);
+          // console.log('socket.id ' + socket.id);
+          // console.log(Game.games[gameId].opponent === socket.id);
+          // console.log(Game.games[gameId].user === socket.id);
+          if(mineFlag){
+            console.log('find mine at ' + openFieldPart);
+            io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, win, Game.games[gameId].user === socket.id, alreadyChecked, flagIsYours );
+            io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, flagIsYours );
+          } else{
+            io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
+            io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
+
+            // if(win) {
+            //   console.log('checkend');
+            //     Game.end(socket.id.toString(), function(gameId, opponent){
+            //         closeRoom(gameId, opponent);
+            //     });
+            // }
           }
-        }
+        } else {
+          io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id );
+          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id );
+      }
     });
   });
 

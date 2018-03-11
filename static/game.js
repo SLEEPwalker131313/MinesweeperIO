@@ -93,16 +93,16 @@ var Minesweeper = {
             });
 
             // К нам подключился соперник, начинаем игру
-            socket.on('ready', function(gameId, turn, x, y, field) {
+            socket.on('ready', function(gameId, x, y, field) {
               console.log('ready!!! field');
               console.log(field);
               console.log("ready " + gameId);
               // console.log(io);
-                $('#status').html('К вам подключился соперник! Игра началась! ' + (turn == 'X' ? 'Сейчас Ваш первый ход' : 'Сейчас ходит соперник') + '!');
+                $('#status').html('К вам подключился соперник! Игра началась!');
                 // console.log('gameId ' + gameId);
                 // console.log('field1 ' + field1);
-                Minesweeper.startGame(gameId, turn, x, y, field);
-                console.log(turn);
+                Minesweeper.startGame(gameId, x, y, field);
+                // console.log(turn);
                 // $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
 
                 // Обязательно зарефакторить
@@ -135,7 +135,9 @@ var Minesweeper = {
                   // console.log(socket.id);
                     // console.log('i');
                     // console.log(Minesweeper.i);
-                    if(Minesweeper.i) socket.emit('step', Minesweeper.gameId, e.target.id, tmp);      //за начальными символами сюда.
+                    // console.log('click');
+                    // console.log(Minesweeper.i);
+                    socket.emit('step', Minesweeper.gameId, e.target.id, tmp);      //за начальными символами сюда.
                 }).hover(function(){
                     $(this).toggleClass('ui-state-hover');
                 }, function(){
@@ -144,17 +146,25 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Start', gameId]);
             });
             // Получаем ход
-            socket.on('step', function(id, turn, win, myChange) {
+            socket.on('step', function(id, win, myChange) {
                 //console.info('step', id, turn, win);
                 console.log(myChange);
-                Minesweeper.move(id, turn, win, myChange);
+                Minesweeper.move(id, win, myChange);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
-            socket.on('findMine', function(id, turn, win, myChange, alreadyChecked, flagIsYours) {
+            socket.on('findMine', function(id, win, myChange, alreadyChecked, flagIsYours) {
                 //console.info('step', id, turn, win);
                 console.log(myChange);
-                Minesweeper.findMine(id, turn, win, myChange, alreadyChecked, flagIsYours);
+                Minesweeper.findMine(id, win, myChange, alreadyChecked, flagIsYours);
+                // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
+            });
+
+            socket.on('endGame', function(id, win, myChange) {
+                //console.info('step', id, turn, win);
+                console.log('check change');
+                console.log(myChange);
+                Minesweeper.endGame(id, win, myChange);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
@@ -173,10 +183,10 @@ var Minesweeper = {
         });
     },
 
-    startGame: function (gameId, turn, x, y, field) {
+    startGame: function (gameId, x, y, field) {
         this.gameId = gameId;
-        this.turn = turn;
-        this.i = (turn == 'X');
+        // this.turn = turn;
+        // this.i = (turn == 'X');
         console.log('field in start');
         console.log(field);
         console.log(field[3]);
@@ -192,7 +202,7 @@ var Minesweeper = {
             table.append(tr);
         }
         $("#board,#timerpanel").show();
-        $('#current-symbol').html(this.turn);
+        $('#current-symbol').html('ds');
         // this.mask(!this.i);
     },
 
@@ -218,10 +228,9 @@ var Minesweeper = {
     //     }
     // },
 
-    move: function (id, turn, win, myChange) {
+    move: function (id, win, myChange) {
         console.log('move');
         console.log(id);
-        console.log(turn);
         function drowChange(id, changeClass){
           for(arr in id){
             $("#" + id[arr]).attr('class', changeClass);
@@ -239,17 +248,17 @@ var Minesweeper = {
           $('#openOpponent').html(openOpponentVal + id.length);
         }
 
-        this.i = (turn != this.turn);
+        // this.i = (turn != this.turn);
         // $("#" + id).attr('class', 'ui-state-hover').html(turn);
-        if (!win) {
-            // this.mask(!this.i);
-            $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
-        } else {
-            this.endGame(turn, win);
-        }
+        // if (!win) {
+        //     // this.mask(!this.i);
+        //     $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
+        // } else {
+        //     this.endGame(turn, win);
+        // }
     },
 
-    findMine: function (id, turn, win, myChange, alreadyChecked, flagIsYours) {
+    findMine: function (id, win, myChange, alreadyChecked, flagIsYours) {
         // console.log('move');
         console.log(id);
         // console.log(turn);
@@ -291,27 +300,28 @@ var Minesweeper = {
           }
         }
 
-        this.i = (turn != this.turn);
+        // this.i = (turn != this.turn);
         // $("#" + id).attr('class', 'ui-state-hover').html(turn);
-        if (!win) {
-            // this.mask(!this.i);
-            $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
-        } else {
-            this.endGame(turn, win);
-        }
+        // if (!win) {
+        //     // this.mask(!this.i);
+        //     $('#status').html('Сейчас ' + (this.i ? 'ваш ход' : 'ходит соперник'));
+        // } else {
+        //     this.endGame(turn, win);
+        // }
     },
 
-    endGame: function (turn, win) {
+    endGame: function (id, win, myChange) {
         clearInterval(this.interval);
+        console.log('endGame! id: ' + id + ' win: ' + win + ' myChange ' + myChange);
         var text = '';
         switch(win) {
-            case 'none': text = 'Ничья!'; break;
+            case 'none1': text = 'Ничья!'; break;
             case 'timeout': text = (turn == this.turn ? 'Слишком долго думали! Вы проиграли!' : 'Соперник так и не смог решить как ему ходить! Вы победили!'); break;
             case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
             default: text = 'Вы ' + (this.i ? 'проиграли! =(' : 'выиграли! =)');
         }
         $('#result').html(text);
-        window.location.reload();
+        // window.location.reload();
         // $("<div/>").html(text).dialog({
         //     title: 'Конец игры',
         //     modal: true,

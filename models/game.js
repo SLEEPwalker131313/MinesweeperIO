@@ -156,11 +156,13 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
             // console.log(this.board[this.openFieldPart[arr]]);
             if(this.field[this.openFieldPart[arr]].toString() == 'true'){
               console.log('boom at ' + this.openFieldPart[arr]);
+              cb('boom', this.openFieldPart, false, false, true);
+              return;
               //end!!!!
             }
             this.board[this.openFieldPart[arr]] = user+'openmine';
           }
-          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, false, false);
+          cb(this.checkEndGame(x, y), this.openFieldPart, false, false, true);
           return;
         } else {
           return;
@@ -176,14 +178,14 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
         if(this.board[x+'x'+y] == false){
           this.board[x+'x'+y] = user+'findmine';
           this.openFieldPart.push(x+'x'+y);
-          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, false, flagIsYours);
+          cb(this.checkEndGame(x, y), this.openFieldPart, true, false, flagIsYours);
         } else if(this.board[x+'x'+y].indexOf('find') != -1){
           this.openFieldPart.push(x+'x'+y);
           console.log(this.board[x+'x'+y].indexOf(user));
           flagIsYours = (this.board[x+'x'+y].indexOf(user) != -1);
           // console.log('flagIsYours ' + flagIsYours);
           this.board[x+'x'+y] = false;
-          cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, true, true, flagIsYours)
+          cb(this.checkEndGame(x, y), this.openFieldPart, true, true, flagIsYours)
         } else{
           return;
         }
@@ -220,7 +222,9 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
       console.log('field: ' + this.field[x + 'x' + y]);
       if(this.field[x + 'x' + y] === true){
         console.log('boom at ' + x + 'x' + y + ' by user '+ user);
+        cb('boom', this.openFieldPart, false, false, true);
         //return with end flag
+        return;
       } else{
         // logNearSpace(this.field, x, y, this);
         this.logNearSpace(x, y);
@@ -241,11 +245,11 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
       }
 
       // this.board[x + 'x' + y] = user;
-      this.turn = (user != this.user ? 'X' : 'O');
-      this.steps++;
+      // this.turn = (user != this.user ? 'X' : 'O');
+      // this.steps++;
       console.log(this.openFieldPart);
       // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
-      cb(this.checkWinner(x, y, this.getTurn(user)), this.getTurn(user), this.openFieldPart, false, false);
+      cb(this.checkEndGame(x, y), this.openFieldPart, false, false, true);
     }
   }
 }
@@ -374,101 +378,44 @@ Minesweeper.prototype.end = function(user, cb) {
 /**
  * Проверяем нет ли победителя
  */
-GameItem.prototype.checkWinner = function(x, y, turn) {
+GameItem.prototype.checkEndGame = function(x, y) {
     // Проверка на ничью, если нет больше свободных полей
-    if(this.steps == (this.x * this.y)) {
-        // Ничья
-        return 'none';
-        // Проверка на победителя
-    } else if(
-        this.checkWinnerDynamic('-', x, y, turn)
-            || this.checkWinnerDynamic('|', x, y, turn)
-            || this.checkWinnerDynamic('\\', x , y, turn)
-            || this.checkWinnerDynamic('/', x, y, turn)
-        ) {
-        // есть победитель
-        return true;
-    } else {
-        // нет победителя
-        return false;
+    // console.log('turn ' + turn);
+    if(this.field[x+'x'+y].toString() == 'true'){
+      console.log('checkwinner boom!');
     }
-}
-
-/**
- * Алгоритм для поля XxY с выиграшем в N полей
- * a - каким алгоритмом ищем
- * now - номер поля куда был сделан ход
- * turn - крестик или нолик ходили
- */
-GameItem.prototype.checkWinnerDynamic = function(a, x, y, turn) {
-    // будем проверять динамически 4 комбинации: горизонталь, вертикаль и 2 диагонали
-    // при этом мы не знаем на какой позиции текущий ход,, проверять будем во всех 4 направлениях
-    var win = 1;
-    switch(a) {
-
-        // поиск по горизонтали
-        case '-':
-            var toLeft = toRight = true,
-                min = x - this.stepsToWin, max = x + this.stepsToWin;
-            min = (min < 1) ? 1 : min;
-            max = (max > this.x) ? this.x : max;
-            for(var i = 1; i <= this.stepsToWin; i++) {
-                if(win >= this.stepsToWin) return true;
-                if(!toLeft && !toRight) return false;
-                if(toLeft && min <= (x-i) && this.board[(x-i) + 'x' + y] == turn) { win++; } else { toLeft = false; }
-                if(toRight && (x+i) <= max && this.board[(x+i) + 'x' + y] == turn) { win++; } else { toRight = false; }
-            }
-            break;
-
-        // поиск по вертикали
-        case '|':
-            var toUp = toDown = true,
-                min = y - this.stepsToWin, max = y + this.stepsToWin;
-            min = (min < 1) ? 1 : min;
-            max = (max > this.y) ? this.y : max;
-            for(var i = 1; i <= this.stepsToWin; i++) {
-               if(win >= this.stepsToWin) return true;
-               if(!toUp && !toDown) return false;
-               if(toUp && min <= (y-i) && this.board[x + 'x' + (y-i)] == turn) { win++; } else { toUp = false; }
-               if(toDown && (y+i) <= max && this.board[x + 'x' + (y+i)] == turn) { win++; } else { toDown = false; }
-            }
+    console.log('checkwinner');
+    var end = 'win';
+    for(arr in this.field){
+      // if(this.field[arr]!=)
+      // console.log(arr+ ': ' +this.board[arr].toString() == false);
+      // console.log(this.board[arr].toString() == 'false');
+      if (this.field[arr].toString() != 'true' && this.board[arr].toString().indexOf('open') != -1){
+        // console.log('nice');
+        // console.log('case 1');
+      } else if (this.field[arr].toString() != 'true' && this.board[arr].toString().indexOf('open') == -1){
+        console.log('arr: ' + arr + ' this.board[arr].toString(): ' + this.board[arr].toString() + ' this.field[arr].toString() ' + this.field[arr].toString());
+        end = 'none';
         break;
-
-        // поиск по диагонали сверху вниз
-        case '\\':
-            var toUpLeft = toDownRight = true,
-                minX = x - this.stepsToWin, maxX = x + this.stepsToWin,
-                minY = y - this.stepsToWin, maxY = y + this.stepsToWin;
-            minX = (minX < 1) ? 1 : minX;
-            maxX = (maxX > this.x) ? this.x : maxX;
-            minY = (minY < 1) ? 1 : minY;
-            maxY = (maxY > this.y) ? this.y : maxY;
-            for(var i = 1; i <= this.stepsToWin; i++) {
-               if(win >= this.stepsToWin) return true;
-               if(!toUpLeft && !toDownRight) return false;
-               if(toUpLeft && minX <= (x-i) && minY <= (y-i) && this.board[(x-i) + 'x' + (y-i)] == turn) { win++; } else { toUpLeft = false; }
-               if(toDownRight && (x+i) <= maxX && (y+i) <= maxY && this.board[(x+i) + 'x' + (y+i)] == turn) { win++; } else { toDownRight = false; }
-            }
-        break;
-
-        // поиск по диагонали снизу вверх
-        case '/':
-            var toDownLeft = toUpRight = true,
-                minX = x - this.stepsToWin, maxX = x + this.stepsToWin,
-                minY = y - this.stepsToWin, maxY = y + this.stepsToWin;
-            minX = (minX < 1) ? 1 : minX;
-            maxX = (maxX > this.x) ? this.x : maxX;
-            minY = (minY < 1) ? 1 : minY;
-            maxY = (maxY > this.y) ? this.y : maxY;
-            for(var i = 1; i <= this.stepsToWin; i++) {
-                if(win >= this.stepsToWin) return true;
-                if(!toDownLeft && !toUpRight) return false;
-                if(toDownLeft && minX <= (x-i) && (y+i) <= maxY && this.board[(x-i) + 'x' + (y+i)] == turn) { win++; } else { toDownLeft = false; }
-                if(toUpRight && (x+i) <= maxX && (y-i) <= maxY && this.board[(x+i) + 'x' + (y-i)] == turn) { win++; } else { toUpRight = false; }
-            }
-        break;
-
-        default: return false; break;
+      }
     }
-    return(win >= this.stepsToWin);
+    console.log('win? ' + end);   //Такая фигня работает, всё ок
+    return end;
+    // // return true;
+    // if(this.steps == (this.x * this.y)) {
+    //     // Ничья
+    //     return 'none';
+    //     // Проверка на победителя
+    // } else if(
+    //     this.checkEndGameDynamic('-', x, y, turn)
+    //         || this.checkEndGameDynamic('|', x, y, turn)
+    //         || this.checkEndGameDynamic('\\', x , y, turn)
+    //         || this.checkEndGameDynamic('/', x, y, turn)
+    //     ) {
+    //     // есть победитель
+    //     return true;
+    // } else {
+    //     // нет победителя
+    //     return false;
+    // }
 }
