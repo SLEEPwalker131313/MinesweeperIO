@@ -1,14 +1,81 @@
 body{
   height: 100%;
   width: 100%;
+  margin: 0px;
+  padding: 0px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14pt;
 }
+a {
+  text-decoration: none;
+  color: black;
+}
+
 #start-game{
-  background-color: yellow;
+  border: 2px solid;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 50pt;
   height: 80px;
-  width: 200px;
+  width: 50%;
+  position: relative;
+  left: 25%;
 }
+
+#GitHub{
+  border: 2px solid;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 50pt;
+  height: 80px;
+  width: 50%;
+  position: relative;
+  left: 25%;
+  top: 25px;
+}
+
+#openField{
+  position: relative;
+  float: left;
+  left: 30px;
+}
+
+#findMine{
+  position: relative;
+  float: right;
+  right: 30px;
+}
+#findOpponentText, #findOpponent, #findUser, #findUserText{
+  text-align: right;
+}
+
+#result{
+  width: 80%;
+  position: relative;
+  left: 10%;
+}
+
 #main-block, #leaderboard{
   display: none;
+}
+
+#state{
+  border-bottom: 3px solid;
+  margin-bottom: 50px;
+}
+#stats{
+  position: relative;
+  float: left;
+  margin-left: 50px;
+}
+
+#status{
+  text-align: right;
+  margin-right: 50px;
+  /*position: relative;
+  float: right;*/
 }
 .visible{
   display: block;
@@ -21,7 +88,16 @@ body{
 }
 
 .ui-state-default{
-  background-color: blue;
+  background-color: #6699CC;
+  box-shadow: inset 1px 2px 5px #000;
+}
+.ui-state-default-2{
+  background-color: #6699CC !important;
+  box-shadow: inset 1px 2px 5px #000;
+}
+
+.ui-state-default:active {
+    background-color: #336699;
 }
 
 .ui-state-hover{
@@ -29,25 +105,83 @@ body{
 }
 
 .ui-state-user{
-  background-color: red;
+  background-color: #CCFFFF;
+  box-shadow: inset 0px 1px 3px #000;
+  text-align: center;
 }
 
 .ui-state-opponent{
-  background-color: green;
+  background-color: #99FFCC;
+  box-shadow: inset 0px 1px 3px #000;
+  text-align: center;
+}
+
+#result{
+  position: relative;
+  top: 30px;
+  min-height: 100px;
+}
+#game-result{
+  font-size: 25pt;
+  position: relative;
+  /*left: 10%;*/
+  margin-left: 10%;
+  top: 30px;
+}
+#find-new-game{
+  font-size: 25pt;
+  position: relative;
+  /*left: 10%;*/
+  top: 30px;
+  cursor: pointer;
+  text-align: center;
 }
 
 .end-game{
-  background-color: magenta;
+  background-color: #6699CC;
+  box-shadow: inset 0px 0px 8px #000;
 }
 
 .last-bomb{
   background-color: silver;
 }
 
+.fail-mine{
+  color: red;
+}
+
 #board-table{
-  border: 3px;
+  width: 80%;
+  position: relative;
+  left: 10%;
+  border: 2px;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+}
+
+.table-elem{
+  width: 50px;
+  height: 30px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 #open{
-  background-color: red;
+  font-size: 32pt;
+  height: 50px;
+  width: 6%;
+  margin-bottom: 20px;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+  left: 48%;
+  border: 2px solid;
+  background-color: #CCFFFF;
+  box-shadow: inset 1px 2px 5px #000;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+
 }

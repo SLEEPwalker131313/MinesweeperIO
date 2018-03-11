@@ -167,8 +167,18 @@ io.on('connection', function(socket) {
           // console.log(Game.games[gameId].user === socket.id);
           if(mineFlag){
             console.log('find mine at ' + openFieldPart);
-            io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, win, Game.games[gameId].user === socket.id, alreadyChecked, flagIsYours );
-            io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, flagIsYours );
+            // console.log('changeOwner ' + changeOwner);
+            console.log('socket.id ' + socket.id);
+            console.log('Game.games[gameId].user ' + Game.games[gameId].user);
+            console.log('Game.games[gameId].opponent ' + Game.games[gameId].opponent);
+
+            if(socket.id == Game.games[gameId].user){
+              io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, win, Game.games[gameId].user === socket.id, alreadyChecked, flagIsYours );
+              io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, !flagIsYours );
+            } else{
+              io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, win, Game.games[gameId].user === socket.id, alreadyChecked, !flagIsYours );
+              io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, flagIsYours );
+            }
           } else{
             io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
             io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
@@ -199,10 +209,13 @@ io.on('connection', function(socket) {
 
 
 function gameStats(){
-  io.sockets.emit('stats', [
-      'Всего игр: ' + countGames,
-      'Уникальных игроков: ' + Object.keys(countPlayers).length,
-      'Сейчас игр: ' + Object.keys(Game.games).length,
-      'Сейчас игроков: ' + Object.keys(Game.users).length
-  ]);
+  io.sockets.emit('stats', Object.keys(Game.games).length, countGames, Object.keys(Game.users).length);
 }
+// function gameStats(){
+//   io.sockets.emit('stats', [
+//       'Всего игр: ' + countGames,
+//       'Уникальных игроков: ' + Object.keys(countPlayers).length,
+//       'Сейчас игр: ' + Object.keys(Game.games).length,
+//       'Сейчас игроков: ' + Object.keys(Game.users).length
+//   ]);
+// }

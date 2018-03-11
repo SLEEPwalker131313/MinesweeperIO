@@ -175,17 +175,27 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
         console.log(this.board[x+'x'+y]);
         this.openFieldPart = [];
         var flagIsYours = true;
-        if(this.board[x+'x'+y] == false){
+        if(this.board[x+'x'+y].toString() == 'false'){
           this.board[x+'x'+y] = user+'findmine';
           this.openFieldPart.push(x+'x'+y);
-          cb(this.checkEndGame(x, y), this.openFieldPart, true, false, flagIsYours);
+          cb(this.checkEndGame(x, y), this.openFieldPart, true, false, user);
         } else if(this.board[x+'x'+y].indexOf('find') != -1){
           this.openFieldPart.push(x+'x'+y);
           console.log(this.board[x+'x'+y].indexOf(user));
-          flagIsYours = (this.board[x+'x'+y].indexOf(user) != -1);
+          console.log(user);
+          flagIsYours = (this.board[x+'x'+y].toString().indexOf(user) != -1);
+          console.log('flagIsYours ' + flagIsYours);
           // console.log('flagIsYours ' + flagIsYours);
           this.board[x+'x'+y] = false;
-          cb(this.checkEndGame(x, y), this.openFieldPart, true, true, flagIsYours)
+          cb(this.checkEndGame(x, y), this.openFieldPart, true, true, flagIsYours);
+          return;
+          // if(flagIsYours){
+          //   cb(this.checkEndGame(x, y), this.openFieldPart, true, true, this.user);
+          //   return;
+          // } else {
+          //   cb(this.checkEndGame(x, y), this.openFieldPart, true, true, this.opponent);
+          //   return;
+          // }
         } else{
           return;
         }

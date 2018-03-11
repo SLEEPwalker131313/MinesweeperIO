@@ -10,6 +10,7 @@
     </style>
     <script src="/socket.io/socket.io.js?x18050"></script>
     <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/static/game.js"></script>
   </head>
@@ -32,22 +33,19 @@
         </span>
       </div>
     </form> -->
+    <div id="state">
+      <div id="stats">
+      </div>
+      <div id="status">
+      </div>
+    </div>
     <div id="start-game">
       New Game
     </div>
-    <div id="state">
-      <!-- <div class="name">
-        Unnamed
-      </div> -->
-      <div class="stat">
-
-      </div>
-      <div id="stats">
-      </div>
-      <div class="connect">
-
-      </div>
+    <div id="github">
+      <a href="https://github.com/SLEEPwalker131313/MinesweeperIO">GitHub</a>
     </div>
+
     <div id="main-block">
       <!-- <canvas id="canvas"></canvas> -->
       <div id="matrix">
@@ -59,16 +57,15 @@
         <div class="matrix-element 6">6</div>
       </div>
     </div>
+    <div id="symbols">
+      <!-- <div id="current-symbol">current symbol</div> -->
+      <div id="open">🏱</div>
+      <!-- <div id="mine-flag">Mine Flag</div> -->
+    </div>
     <table id="board-table">
 
     </table>
-    <div id="symbols">
-      <!-- <div id="current-symbol">current symbol</div> -->
-      <div id="open">Open</div>
-      <!-- <div id="mine-flag">Mine Flag</div> -->
-    </div>
-    <div id="status">
-    </div>
+
     <!-- <div id="reload">
       reload
     </div>
@@ -78,13 +75,13 @@
     <div id="result">
       <div id="openField">
         <div id="openUserText">
-          Field you
+          Open by you
         </div>
         <div id="openUser">
           0
         </div>
         <div id="openOpponentText">
-          Field opponent
+          Open by second player
         </div>
         <div id="openOpponent">
           0
@@ -92,13 +89,13 @@
       </div>
       <div id="findMine">
         <div id="findUserText">
-          Find you
+          Checked by you
         </div>
         <div id="findUser">
           0
         </div>
         <div id="findOpponentText">
-          Find opponent
+          Checked by second player
         </div>
         <div id="findOpponent">
           0

@@ -39,36 +39,29 @@ var Minesweeper = {
             // };
             // $('#name-form').submit(send_name);
             $('#start-game').click(function() {
-              $('#start-game').hide();
+              $('#start-game,#github').hide();
               socket.emit('start');
             });
 
               ////////////////////////////////////////////
 
-
-            socket.on('stats', function(data) {
-              // console.log(data);
-              // $('.stats').html(data[3]);
-              // console.log(data);
-            });
-
             socket.on('connect', function () {
-                $('#status').html('Успешно подключились к игровому серверу');
+                $('#status').html('Successfully connected to the game server');
                 $('#reload').show();
                 // _gaq.push(['_trackEvent', 'WebSocket', 'Success']);
             });
             socket.on('reconnect', function () {
                 $('#reload').show();
-                $('#connect-status').html('Переподключились, продолжайте игру');
+                $('#connect-status').html('Reconnected, you can continue the game');
                 // _gaq.push(['_trackEvent', 'WebSocket', 'Reconnect']);
             });
             socket.on('reconnecting', function () {
                 $('#reload').hide();
-                $('#status').html('Соединение с сервером потеряно, переподключаемся...');
+                $('#status').html('Connection to the server is lost, reconnect...');
                 // _gaq.push(['_trackEvent', 'WebSocket', 'Reconnecting']);
             });
             socket.on('error', function (e) {
-                $('#status').html('Ошибка: ' + (e ? e : 'неизвестная ошибка'));
+                $('#status').html('Error: ' + (e ? e : 'unknown error'));
                 // _gaq.push(['_trackEvent', 'WebSocket', 'Error', (e ? e : 'неизвестная ошибка')]);
             });
 
@@ -78,7 +71,7 @@ var Minesweeper = {
             // Ожидаем соперника
             socket.on('wait', function(){
               console.log('waitttt');
-                $('#status').append('... Ожидаем соперника...');
+                $('#status').append('... Expect the second player...');
                 // _gaq.push(['_trackEvent', 'Game', 'Wait']);
             });
             // Соперник отлючился
@@ -98,7 +91,7 @@ var Minesweeper = {
               console.log(field);
               console.log("ready " + gameId);
               // console.log(io);
-                $('#status').html('К вам подключился соперник! Игра началась!');
+                $('#status').html('The second player connected to you! The game has begun!');
                 // console.log('gameId ' + gameId);
                 // console.log('field1 ' + field1);
                 Minesweeper.startGame(gameId, x, y, field);
@@ -114,13 +107,13 @@ var Minesweeper = {
                 //   $('#open').css('background-color', 'white');
                 // });
                 $('#open').click(function(){
-                  if($('#open').text().toString() == 'Open'){
+                  if($('#open').text().toString() == '🏱'){
                     tmp = 'Mine Flag';
-                    $('#open').html('Mine FLag');
+                    $('#open').html('💣');
                   }
                   else {
                     tmp = 'Open';
-                    $('#open').html('Open');
+                    $('#open').html('🏱');
                   }
                   // $('#current-symbol').html(tmp);
                   // $('#open').css('background-color', 'red');
@@ -176,12 +169,9 @@ var Minesweeper = {
             });
 
             // Статистика
-            socket.on('stats', function (arr) {
+            socket.on('stats', function (countGames, countTotalGames, countUsers) {
                 var stats = $('#stats');
-                stats.find('div').not('.turn').remove();
-                for(val in arr) {
-                    stats.prepend($('<div/>').attr('class', 'ui-state-hover ui-corner-all').html(arr[val]));
-                }
+                stats.html('Total games: ' + countTotalGames + ' Games online: ' + countGames + ' Players online: ' + countUsers);
             });
         });
     },
@@ -200,7 +190,7 @@ var Minesweeper = {
         for(var i = 1; i <= x; i++) {
             var tr = $('<tr/>');
             for(var j = 1; j <= y; j++) {
-                tr.append($('<td/>').attr('id', i + 'x' + j).addClass('ui-state-default').html(field[count++]));
+                tr.append($('<td/>').attr('id', i + 'x' + j).addClass('table-elem ui-state-default').html(field[count++]));
             }
             table.append(tr);
         }
@@ -267,12 +257,12 @@ var Minesweeper = {
         // console.log(turn);
         function drowChangeFindMine(id, changeClass){
           console.log('foo');
-          if($("#" + id).text() == 'flag'){
+          if($("#" + id).text() == '🏱'){
             console.log('already');
-            $("#" + id).attr('class','ui-state-default').html('');    //На текст пофиг, в конце ведь не будет, а стиль дефолтный.
+            $("#" + id).attr('class','ui-state-default-2').html('');    //На текст пофиг, в конце ведь не будет, а стиль дефолтный.
 
           } else {
-            $("#" + id).attr('class', changeClass).html('flag');
+            $("#" + id).attr('class', changeClass).html('🏱');
           }
         }
         console.log(id);
@@ -287,6 +277,9 @@ var Minesweeper = {
 
         var valChange = (alreadyChecked) ? -1:1;
         // var valChange = 1;
+        console.log('alreadyChecked ' + alreadyChecked);
+        console.log('flagIsYours ' + flagIsYours);
+        console.log('myChange ' + myChange);
         if(alreadyChecked){
           if(flagIsYours){
             $('#findUser').html(findUserVal + valChange);
@@ -320,7 +313,7 @@ var Minesweeper = {
         var text = '';
         switch(win) {
           case 'boom' : text = 'Boom! Game is over'; break;
-          case 'win' : text = 'Congradulation!'; break;
+          case 'win' : text = 'Congratulations!'; break;
             // case 'none1': text = 'Ничья!'; break;
             // case 'timeout': text = (turn == this.turn ? 'Слишком долго думали! Вы проиграли!' : 'Соперник так и не смог решить как ему ходить! Вы победили!'); break;
             // case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
@@ -339,12 +332,12 @@ var Minesweeper = {
               if(field[count] == 0){
                 $("#" + i + "x" + j).html(' ');
               } else if(field[count].toString() == 'true'){
-                $("#" + i + "x" + j).html('truuu');
+                $("#" + i + "x" + j).html('💣');
               } else {
                 $("#" + i + "x" + j).html(field[count]);
               }
-              if(board[count].toString().indexOf('find') != -1 && field[count].toString() == 'true'){
-                $("#" + i + "x" + j).html('failmine');
+              if(board[count].toString().indexOf('find') != -1 && field[count].toString() != 'true'){
+                $("#" + i + "x" + j).addClass('fail-mine').html('💣');
               }
               ++count;
             }
@@ -353,7 +346,7 @@ var Minesweeper = {
         for(i in id){
           // console.log(id[i]);
           // console.log($('#'+id[i]).text().toString() == 'truuu');
-          if($('#'+id[i]).text().toString() == 'truuu')
+          if($('#'+id[i]).text().toString() == '💣')
             $('#'+id[i]).addClass('last-bomb');
         }
 
