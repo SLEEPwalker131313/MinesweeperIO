@@ -222,6 +222,7 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
       console.log('field: ' + this.field[x + 'x' + y]);
       if(this.field[x + 'x' + y] === true){
         console.log('boom at ' + x + 'x' + y + ' by user '+ user);
+        this.openFieldPart.push(x+'x'+y);
         cb('boom', this.openFieldPart, false, false, true);
         //return with end flag
         return;

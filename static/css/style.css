@@ -40,6 +40,10 @@ body{
   background-color: magenta;
 }
 
+.last-bomb{
+  background-color: silver;
+}
+
 #board-table{
   border: 3px;
 }

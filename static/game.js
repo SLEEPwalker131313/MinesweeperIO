@@ -107,17 +107,24 @@ var Minesweeper = {
 
                 // Обязательно зарефакторить
                 var tmp = 'Open';
-                $('#mine-flag').click(function(){
-                  tmp = $('#mine-flag').text();
-                  $('#current-symbol').html(tmp);
-                  $('#mine-flag').css('background-color', 'red');
-                  $('#open').css('background-color', 'white');
-                });
+                // $('#mine-flag').click(function(){
+                //   tmp = $('#mine-flag').text();
+                //   $('#current-symbol').html(tmp);
+                //   $('#mine-flag').css('background-color', 'red');
+                //   $('#open').css('background-color', 'white');
+                // });
                 $('#open').click(function(){
-                  tmp = $('#open').text();
-                  $('#current-symbol').html(tmp);
-                  $('#open').css('background-color', 'red');
-                  $('#mine-flag').css('background-color', 'white');
+                  if($('#open').text().toString() == 'Open'){
+                    tmp = 'Mine Flag';
+                    $('#open').html('Mine FLag');
+                  }
+                  else {
+                    tmp = 'Open';
+                    $('#open').html('Open');
+                  }
+                  // $('#current-symbol').html(tmp);
+                  // $('#open').css('background-color', 'red');
+                  // $('#mine-flag').css('background-color', 'white');
                 });
                 // console.log(socket.id);
                 // var socket.id('ls') = 1;
@@ -160,11 +167,11 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
-            socket.on('endGame', function(id, win, myChange, field) {
+            socket.on('endGame', function(id, win, myChange, field, board) {
                 //console.info('step', id, turn, win);
                 console.log('check change');
                 console.log(myChange);
-                Minesweeper.endGame(id, win, myChange, field);
+                Minesweeper.endGame(id, win, myChange, field, board);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
@@ -306,9 +313,10 @@ var Minesweeper = {
         // }
     },
 
-    endGame: function (id, win, myChange, field) {
+    endGame: function (id, win, myChange, field, board) {
         clearInterval(this.interval);
         console.log('endGame! id: ' + id + ' win: ' + win + ' myChange ' + myChange);
+
         var text = '';
         switch(win) {
           case 'boom' : text = 'Boom! Game is over'; break;
@@ -327,16 +335,28 @@ var Minesweeper = {
         for(var i = 1; i <= 16; i++) {
             // var tr = $('<tr/>');
             for(var j = 1; j <= 30; j++) {
+
               if(field[count] == 0){
                 $("#" + i + "x" + j).html(' ');
               } else if(field[count].toString() == 'true'){
                 $("#" + i + "x" + j).html('truuu');
               } else {
-                $("#" + i + "x" + j).html(field[count] + 1);
+                $("#" + i + "x" + j).html(field[count]);
+              }
+              if(board[count].toString().indexOf('find') != -1 && field[count].toString() == 'true'){
+                $("#" + i + "x" + j).html('failmine');
               }
               ++count;
             }
         }
+
+        for(i in id){
+          // console.log(id[i]);
+          // console.log($('#'+id[i]).text().toString() == 'truuu');
+          if($('#'+id[i]).text().toString() == 'truuu')
+            $('#'+id[i]).addClass('last-bomb');
+        }
+
         $('#find-new-game').click(function(){
           window.location.reload();
         });

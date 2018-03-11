@@ -178,9 +178,10 @@ io.on('connection', function(socket) {
             // }
           }
         } else {
-          var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
-          io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id, arr);
-          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id, arr);
+          var sendField = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
+          var sendBoard = Object.keys(Game.games[gameId].board).map(function (key) { return Game.games[gameId].board[key]; });
+          io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id, sendField, sendBoard);
+          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id, sendField, sendBoard);
           Game.end(socket.id.toString(), function(gameId, opponent){
               closeRoom(gameId, opponent);
           });
