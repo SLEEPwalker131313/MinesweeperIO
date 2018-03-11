@@ -160,11 +160,11 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
-            socket.on('endGame', function(id, win, myChange) {
+            socket.on('endGame', function(id, win, myChange, field) {
                 //console.info('step', id, turn, win);
                 console.log('check change');
                 console.log(myChange);
-                Minesweeper.endGame(id, win, myChange);
+                Minesweeper.endGame(id, win, myChange, field);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
@@ -197,7 +197,7 @@ var Minesweeper = {
             }
             table.append(tr);
         }
-        $("#board,#timerpanel,#result").show();
+        $("#board,#timerpanel,#result,#symbols").show();
         $('#current-symbol').html('ds');
         // this.mask(!this.i);
     },
@@ -306,19 +306,37 @@ var Minesweeper = {
         // }
     },
 
-    endGame: function (id, win, myChange) {
+    endGame: function (id, win, myChange, field) {
         clearInterval(this.interval);
         console.log('endGame! id: ' + id + ' win: ' + win + ' myChange ' + myChange);
         var text = '';
         switch(win) {
-            case 'none1': text = 'Ничья!'; break;
-            case 'timeout': text = (turn == this.turn ? 'Слишком долго думали! Вы проиграли!' : 'Соперник так и не смог решить как ему ходить! Вы победили!'); break;
-            case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
-            default: text = 'Вы ' + (this.i ? 'проиграли! =(' : 'выиграли! =)');
+          case 'boom' : text = 'Boom! Game is over'; break;
+          case 'win' : text = 'Congradulation!'; break;
+            // case 'none1': text = 'Ничья!'; break;
+            // case 'timeout': text = (turn == this.turn ? 'Слишком долго думали! Вы проиграли!' : 'Соперник так и не смог решить как ему ходить! Вы победили!'); break;
+            // case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
+            // default: text = 'Вы ' + (this.i ? 'проиграли! =(' : 'выиграли! =)');
         }
         $('#game-result').html(text);
-
+        $('#result').addClass('end-game');
         $('#find-new-game,#game-result').show();
+        console.log(field);
+
+        var count = 0;
+        for(var i = 1; i <= 16; i++) {
+            // var tr = $('<tr/>');
+            for(var j = 1; j <= 30; j++) {
+              if(field[count] == 0){
+                $("#" + i + "x" + j).html(' ');
+              } else if(field[count].toString() == 'true'){
+                $("#" + i + "x" + j).html('truuu');
+              } else {
+                $("#" + i + "x" + j).html(field[count] + 1);
+              }
+              ++count;
+            }
+        }
         $('#find-new-game').click(function(){
           window.location.reload();
         });

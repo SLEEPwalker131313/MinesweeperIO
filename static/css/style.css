@@ -36,6 +36,10 @@ body{
   background-color: green;
 }
 
+.end-game{
+  background-color: magenta;
+}
+
 #board-table{
   border: 3px;
 }

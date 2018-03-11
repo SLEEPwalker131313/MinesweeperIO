@@ -50,7 +50,7 @@ io.on('connection', function(socket) {
   function closeRoom(gameId, opponent) {
     socket.leave(gameId);
     io.sockets.sockets[opponent].leave(gameId);
-    countGames--;
+    // countGames--;
   }
 
   // setInterval(function() {
@@ -178,8 +178,9 @@ io.on('connection', function(socket) {
             // }
           }
         } else {
-          io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id );
-          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id );
+          var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
+          io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id, arr);
+          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id, arr);
           Game.end(socket.id.toString(), function(gameId, opponent){
               closeRoom(gameId, opponent);
           });
