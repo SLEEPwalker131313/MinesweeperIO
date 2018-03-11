@@ -13,7 +13,7 @@ var Minesweeper = module.exports = function() {
     this.x = 16;
     this.y = 30;
     // Шагов до победы
-    this.numberOfMines = 99;
+    this.numberOfMines = 29; //default 99
     // this.stepsToWin = 4;
 }
 util.inherits(Minesweeper, EventEmitter);
@@ -124,6 +124,7 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
   console.log('models.step');
     // if(this.board[x + 'x' + y] !== undefined) return;
     console.log('models.step2');
+    console.log(this.board[x+'x'+y]);
     // console.log(symbol);
     // console.log(this.board);
     if(this.board[x+'x'+y].toString().indexOf('open') != -1){ //Smart oppening
@@ -177,8 +178,10 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
         var flagIsYours = true;
         if(this.board[x+'x'+y].toString() == 'false'){
           this.board[x+'x'+y] = user+'findmine';
+          console.log("this.board[x+'x'+y] " + this.board[x+'x'+y] );
           this.openFieldPart.push(x+'x'+y);
           cb(this.checkEndGame(x, y), this.openFieldPart, true, false, user);
+          return;
         } else if(this.board[x+'x'+y].indexOf('find') != -1){
           this.openFieldPart.push(x+'x'+y);
           console.log(this.board[x+'x'+y].indexOf(user));

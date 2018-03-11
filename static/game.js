@@ -86,15 +86,15 @@ var Minesweeper = {
             });
 
             // К нам подключился соперник, начинаем игру
-            socket.on('ready', function(gameId, x, y, field) {
+            socket.on('ready', function(gameId, x, y) {
               console.log('ready!!! field');
-              console.log(field);
+              // console.log(field);
               console.log("ready " + gameId);
               // console.log(io);
                 $('#status').html('The second player connected to you! The game has begun!');
                 // console.log('gameId ' + gameId);
                 // console.log('field1 ' + field1);
-                Minesweeper.startGame(gameId, x, y, field);
+                Minesweeper.startGame(gameId, x, y);
                 // console.log(turn);
                 // $('#stats').append($('<div/>').attr('class', 'turn ui-state-hover ui-corner-all').html('Вы играете: <b>' + (turn=='X'?'Крестиком':'Ноликом') + '</b>'));
 
@@ -146,10 +146,10 @@ var Minesweeper = {
                 // _gaq.push(['_trackEvent', 'Game', 'Start', gameId]);
             });
             // Получаем ход
-            socket.on('step', function(id, win, myChange) {
+            socket.on('step', function(id, field, win, myChange) {
                 //console.info('step', id, turn, win);
                 console.log(myChange);
-                Minesweeper.move(id, win, myChange);
+                Minesweeper.move(id, field, win, myChange);
                 // _gaq.push(['_trackEvent', 'Game', 'Step', id + ' / ' + turn + ' / ' + win]);
             });
 
@@ -176,21 +176,17 @@ var Minesweeper = {
         });
     },
 
-    startGame: function (gameId, x, y, field) {
+    startGame: function (gameId, x, y) {
         this.gameId = gameId;
         // this.turn = turn;
         // this.i = (turn == 'X');
-        console.log('field in start');
-        console.log(field);
-        console.log(field[3]);
         // console.log("start!!");
         // console.log(field);
-        var count = 0;
         var table = $('#board-table').empty();
         for(var i = 1; i <= x; i++) {
             var tr = $('<tr/>');
             for(var j = 1; j <= y; j++) {
-                tr.append($('<td/>').attr('id', i + 'x' + j).addClass('table-elem ui-state-default').html(field[count++]));
+                tr.append($('<td/>').attr('id', i + 'x' + j).addClass('table-elem ui-state-default').html(''));
             }
             table.append(tr);
         }
@@ -221,12 +217,16 @@ var Minesweeper = {
     //     }
     // },
 
-    move: function (id, win, myChange) {
+    move: function (id, field, win, myChange) {
         console.log('move');
         console.log(id);
+        console.log(field);
         function drowChange(id, changeClass){
           for(arr in id){
-            $("#" + id[arr]).attr('class', changeClass);
+            if(field[arr] == 0){
+              $("#" + id[arr]).attr('class', changeClass).html(' ');
+            } else
+              $("#" + id[arr]).attr('class', changeClass).html(field[arr]);
           }
         }
 
@@ -262,7 +262,7 @@ var Minesweeper = {
             $("#" + id).attr('class','ui-state-default-2').html('');    //На текст пофиг, в конце ведь не будет, а стиль дефолтный.
 
           } else {
-            $("#" + id).attr('class', changeClass).html('🏱');
+            $("#" + id).attr('class', changeClass).html('<b style="color:red">🏱</b>');
           }
         }
         console.log(id);

@@ -84,9 +84,9 @@ io.on('connection', function(socket) {
             socket.join(gameId);
             io.sockets.sockets[opponent].join(gameId);
             console.log('ready gameId: ' + gameId + ' x: ' +x + ' y: ' + y);
-            var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
+            // var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
 
-            socket.emit('ready', gameId, x, y, arr);
+            socket.emit('ready', gameId, x, y);
             console.log('games');
             // console.log(Game.games[gameId].field['2x4']);
             // console.log(Object.keys(Game.games[gameId].field));
@@ -97,8 +97,8 @@ io.on('connection', function(socket) {
             // var arr = 'ds'
             // socket.emit('field', Game.games[gameId].field);
             // socket.emit('field', arr);
-            console.log(arr);
-            io.sockets.sockets[opponent].emit('ready', gameId, x, y, arr);
+            // console.log(arr);
+            io.sockets.sockets[opponent].emit('ready', gameId, x, y);
             countGames++;
         } else {
             // ожидает аппонента
@@ -180,8 +180,14 @@ io.on('connection', function(socket) {
               io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, flagIsYours );
             }
           } else{
-            io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
-            io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
+            var sendField = [];
+            console.log('log openFieldPart');
+            for(tmp in openFieldPart){
+              console.log(Game.games[gameId].field[openFieldPart[tmp]]);
+              sendField.push(Game.games[gameId].field[openFieldPart[tmp]]);
+            }
+            io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, sendField, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
+            io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, sendField, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
 
             // if(win) {
             //   console.log('checkend');
