@@ -176,10 +176,6 @@ var Minesweeper = {
                     stats.prepend($('<div/>').attr('class', 'ui-state-hover ui-corner-all').html(arr[val]));
                 }
             });
-
-            socket.on('socketlog', function(data){
-              console.log(data);
-            })
         });
     },
 
@@ -201,7 +197,7 @@ var Minesweeper = {
             }
             table.append(tr);
         }
-        $("#board,#timerpanel").show();
+        $("#board,#timerpanel,#result").show();
         $('#current-symbol').html('ds');
         // this.mask(!this.i);
     },
@@ -320,8 +316,12 @@ var Minesweeper = {
             case 'exit': text = 'Соперник сбежал с поля боя! Игра закончена'; break;
             default: text = 'Вы ' + (this.i ? 'проиграли! =(' : 'выиграли! =)');
         }
-        $('#result').html(text);
-        // window.location.reload();
+        $('#game-result').html(text);
+
+        $('#find-new-game,#game-result').show();
+        $('#find-new-game').click(function(){
+          window.location.reload();
+        });
         // $("<div/>").html(text).dialog({
         //     title: 'Конец игры',
         //     modal: true,

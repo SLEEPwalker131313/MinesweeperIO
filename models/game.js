@@ -352,13 +352,6 @@ Minesweeper.prototype.start = function(user, cb) {
 }
 
 /**
- * Получаем чем ходит игрок
- */
-GameItem.prototype.getTurn = function(user) {
-    return (user == this.user ? 'X' : 'O');
-}
-
-/**
  * Выходим из игры
  */
 Minesweeper.prototype.end = function(user, cb) {
@@ -401,21 +394,4 @@ GameItem.prototype.checkEndGame = function(x, y) {
     }
     console.log('win? ' + end);   //Такая фигня работает, всё ок
     return end;
-    // // return true;
-    // if(this.steps == (this.x * this.y)) {
-    //     // Ничья
-    //     return 'none';
-    //     // Проверка на победителя
-    // } else if(
-    //     this.checkEndGameDynamic('-', x, y, turn)
-    //         || this.checkEndGameDynamic('|', x, y, turn)
-    //         || this.checkEndGameDynamic('\\', x , y, turn)
-    //         || this.checkEndGameDynamic('/', x, y, turn)
-    //     ) {
-    //     // есть победитель
-    //     return true;
-    // } else {
-    //     // нет победителя
-    //     return false;
-    // }
 }

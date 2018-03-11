@@ -175,14 +175,14 @@ io.on('connection', function(socket) {
 
             // if(win) {
             //   console.log('checkend');
-            //     Game.end(socket.id.toString(), function(gameId, opponent){
-            //         closeRoom(gameId, opponent);
-            //     });
             // }
           }
         } else {
           io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id );
           io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id );
+          Game.end(socket.id.toString(), function(gameId, opponent){
+              closeRoom(gameId, opponent);
+          });
       }
     });
   });
