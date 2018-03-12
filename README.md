@@ -20,7 +20,7 @@ npm
 Browse to the project folder and start the server.
 ```
 cd /path/to/MinesweeperIO
-nide server.js
+node server.js
 ```
 
 After that, the game will be available at
