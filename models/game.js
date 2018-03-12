@@ -1,65 +1,38 @@
 var util = require('util'), EventEmitter = require('events').EventEmitter;
 
 var Minesweeper = module.exports = function() {
-    // Инициализируем события
+    // Init
     EventEmitter.call(this);
-    // Массив id игры = объект игры
+    // Games collection
     this.games = [];
-    // Массив подключённых пользователей = id игры
+    // Users array
     this.users = [];
-    // Массив пользователей ожидающих оппонентов для начало игры
+    // Wait users array
     this.free = [];
-    // Размеры поля
+    // Board size
     this.x = 16;
     this.y = 30;
-    // Шагов до победы
-    this.numberOfMines = 29; //default 99
-    // this.stepsToWin = 4;
+    // Mines count
+    this.numberOfMines = 59; //default 99
 }
 util.inherits(Minesweeper, EventEmitter);
 
 var GameItem = function(user, opponent, x, y, numberOfMines, field1, board) {
-    // Инициализируем события
     EventEmitter.call(this);
-    // Ячейки игрового поля
+    // Users action board
     this.board = board;
+    // Real board
     this.field = field1;
-    // Игроки
-    this.user = user; // X
-    this.opponent = opponent; // O
-    // Размеры поля
+    // Players
+    this.user = user;
+    this.opponent = opponent;
+    // Board size
     this.x = x;
     this.y = y;
-    // Шагов до победы
-    // this.stepsToWin = stepsToWin;
-    //Число мин
+    //Count of mines
     this.numberOfMines = numberOfMines;
-    // Кол-во сделанных ходов
-    this.steps = 0;
-    // Кто ходит
-    this.turn = 'X';
-
+    //Step variable
     this.openFieldPart = [];
-
-    this.openUser = 0;
-    this.openOpponent = 0;
-
-    this.findUser = 0;
-    this.findOpponent = 0;
-    // Таймер хода
-    // this.timeout = null;
-    // Запускаем таймер
-    // this.on('timer', function(state, user) {
-    //     if(state == 'stop') {
-    //         clearTimeout(this.timeout);
-    //         this.timeout = null;
-    //     } else {
-    //         var game = this;
-    //         this.timeout = setTimeout(function() {
-    //             game.emit('timeout', user);
-    //         }, 15000);
-    //     }
-    // });
 }
 util.inherits(GameItem, EventEmitter);
 
@@ -90,12 +63,8 @@ GameItem.prototype.logNearSpace = function (x, y){
   if(y >= 1 && y <= this.y && x >= 1 && x <= this.x
     && this.field[x+'x'+y] === 0 && this.openFieldPart.indexOf(x+'x'+y) == -1
     && this.board[x+'x'+y].toString().indexOf('open') == -1){
-    // console.log(Minesweeper.games);
-    // console.log('this');
-    // console.log(this);
     if(this.board[x+'x'+y].toString().indexOf('find') == -1)
       this.openFieldPart.push(x+'x'+y);
-    console.log('x: ' + x + ' y: ' + y);
     this.logNearSpace(x - 1, y - 1);
     this.logNearSpace(x + 1, y - 1);
     this.logNearSpace(x - 1, y + 1);
@@ -110,34 +79,20 @@ GameItem.prototype.logNearSpace = function (x, y){
         && this.board[x+'x'+y].toString().indexOf('open') == -1){
         if(this.board[x+'x'+y].toString().indexOf('find') == -1)
           this.openFieldPart.push(x+'x'+y);
-        // console.log('elselog');
-        // console.log('x: ' + x + ' y: ' + y);
       }
     return;
   }
 }
 
 /**
- * Сделан ход
+ * Step
  */
 GameItem.prototype.step = function(x, y, user, symbol, cb) {
-  console.log('models.step');
-    // if(this.board[x + 'x' + y] !== undefined) return;
-    console.log('models.step2');
-    console.log(this.board[x+'x'+y]);
-    // console.log(symbol);
-    // console.log(this.board);
     if(this.board[x+'x'+y].toString().indexOf('open') != -1){ //Smart oppening
-      console.log('smart');
-      // if(this.field[x+'x'])
-      console.log(this.field[x+'x'+y]);
       if(this.field[x+'x'+y] == 0){
         return;
       } else {
-        console.log(this.field[x+'x'+y]);
-        console.log(this.nearMinesFind(x, y));
-        if(this.nearMinesFind(x, y) == this.field[x+'x'+y]){ //вернуть ли если >=
-          console.log('correct');
+        if(this.nearMinesFind(x, y) == this.field[x+'x'+y]){ // >= maybe
           this.openFieldPart = [];
           this.logNearSpace(x - 1, y - 1);
           this.logNearSpace(x - 1, y);
@@ -147,19 +102,12 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
           this.logNearSpace(x + 1, y - 1);
           this.logNearSpace(x + 1, y);
           this.logNearSpace(x + 1, y + 1);
-          // this.openFieldPart = [(x+1)+'x'+y, (x-1)+'x'+y, x+'x'+(y-1), x+'x'+(y+1)];
-          console.log('this.openFieldPart');
-          console.log(this.openFieldPart);
 
           for(arr in this.openFieldPart){
-            console.log(this.field[this.openFieldPart[arr]]);
-            // console.log('nonmine');
-            // console.log(this.board[this.openFieldPart[arr]]);
+            //game over without  additional checking
             if(this.field[this.openFieldPart[arr]].toString() == 'true'){
-              console.log('boom at ' + this.openFieldPart[arr]);
               cb('boom', this.openFieldPart, false, false, true);
               return;
-              //end!!!!
             }
             this.board[this.openFieldPart[arr]] = user+'openmine';
           }
@@ -171,138 +119,76 @@ GameItem.prototype.step = function(x, y, user, symbol, cb) {
       }
     } else {  //Non-smart
       if(symbol == 'Mine Flag'){  //Flag
-        console.log('mine flag');
-        //check  dynamic board
-        console.log(this.board[x+'x'+y]);
-        this.openFieldPart = [];
+        this.openFieldPart = [];  //Clear for this step
         var flagIsYours = true;
-        if(this.board[x+'x'+y].toString() == 'false'){
+        if(this.board[x+'x'+y].toString() == 'false'){  //Non-checked
           this.board[x+'x'+y] = user+'findmine';
-          console.log("this.board[x+'x'+y] " + this.board[x+'x'+y] );
           this.openFieldPart.push(x+'x'+y);
           cb(this.checkEndGame(x, y), this.openFieldPart, true, false, user);
           return;
-        } else if(this.board[x+'x'+y].indexOf('find') != -1){
+        } else if(this.board[x+'x'+y].indexOf('find') != -1){ //Already checked
           this.openFieldPart.push(x+'x'+y);
-          console.log(this.board[x+'x'+y].indexOf(user));
-          console.log(user);
           flagIsYours = (this.board[x+'x'+y].toString().indexOf(user) != -1);
-          console.log('flagIsYours ' + flagIsYours);
-          // console.log('flagIsYours ' + flagIsYours);
           this.board[x+'x'+y] = false;
           cb(this.checkEndGame(x, y), this.openFieldPart, true, true, flagIsYours);
           return;
-          // if(flagIsYours){
-          //   cb(this.checkEndGame(x, y), this.openFieldPart, true, true, this.user);
-          //   return;
-          // } else {
-          //   cb(this.checkEndGame(x, y), this.openFieldPart, true, true, this.opponent);
-          //   return;
-          // }
-        } else{
-          return;
         }
-        // if(this.board[x+'x'+y] != false) {
-        //   console.log('boarditem');
-        //   console.log(this.board[x+'x'+y]);
-        //   console.log(this.board[x+'x'+y].indexOf('open'));
-        //   console.log(this.board[x+'x'+y].indexOf('find'));
-        //   return;
-        // }
-
 
       } else {  //Open field
-        console.log('nonmine');
-        console.log(this.board[x+'x'+y]);
         if(this.board[x+'x'+y]!= false){
+          //Non-checked item
           if(this.board[x+'x'+y].indexOf('find') != -1 ){
             return;
           }
-          if(this.board[x+'x'+y].indexOf('open') != -1){ //изменить, ибо надо обработать штуку быстрого открытия поля
+          //Non-oppened item after amsrt oppening
+          if(this.board[x+'x'+y].indexOf('open') != -1){
             return;
           }
         }
-      // console.log(this);
-      // console.log(user);
-      // console.log(GameItem);
-      // console.log(this.field);
-      // console.log('x: ' + x + ' y: ' + y);
-      // var openFieldPart = [];
       this.openFieldPart = [];
-
-
-      console.log(this.field[x + 'x' + y]);
-      console.log('field: ' + this.field[x + 'x' + y]);
       if(this.field[x + 'x' + y] === true){
-        console.log('boom at ' + x + 'x' + y + ' by user '+ user);
         this.openFieldPart.push(x+'x'+y);
+        //Game over without checking
         cb('boom', this.openFieldPart, false, false, true);
-        //return with end flag
         return;
       } else{
-        // logNearSpace(this.field, x, y, this);
+        //Open near
         this.logNearSpace(x, y);
       }
-
-      console.log('user');
-      console.log(this.user);
-      console.log(this.openFieldPart.length);
-      if(user == this.user){
-        this.openUser += this.openFieldPart.length;
-      } else {
-        this.openOpponent += this.openFieldPart.length;
-      }
-
       this.board[x+'x'+y] = user+'openmine';
       for(arr in this.openFieldPart){
         this.board[this.openFieldPart[arr]] = user+'openmine';
       }
-
-      // this.board[x + 'x' + y] = user;
-      // this.turn = (user != this.user ? 'X' : 'O');
-      // this.steps++;
-      console.log(this.openFieldPart);
-      // this.emit('timer', 'start', (user == this.user ? this.opponent : this.user));
       cb(this.checkEndGame(x, y), this.openFieldPart, false, false, true);
+      return;
     }
   }
 }
 
 Minesweeper.prototype.step = function(gameId, x, y, user, symbol, cb) {
-    //console.info('Step');
-    //console.dir(this.games[gameId]);
     this.games[gameId].step(x, y, user, symbol, cb);
 }
 
 /**
- * Запускаем игру
+ * Start game
  */
 Minesweeper.prototype.start = function(user, cb) {
-    // Размер игрового поля и кол-во ходов для победы
-    // Ищем свободные игры
     if(Object.keys(this.free).length > 0) {
         var opponent = Object.keys(this.free).shift();
         delete this.free[opponent];
-        // Если есть ожидающие игру, создаём им игру
-
         function getRandomInRange(min, max) {
           return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-
         var field1 = [];
         var board = [];
-        console.log('start!!!');
         for (var rows = 1; rows <= this.x; rows++) {
           for (var cols = 1; cols <= this.y; cols++){
             field1[rows+'x'+cols] = board[rows+'x'+cols] = false;
           }
         }
-
-        // console.log(field1[1+'x'+2] == true);
-
         var mines = 0;
         var irow, icol;
-        while(mines < 99) {
+        while(mines < this.numberOfMines) {
           irow = getRandomInRange(1, this.x);
           icol = getRandomInRange(1, this.y);
           if(field1[irow+'x'+icol] == false){
@@ -340,33 +226,29 @@ Minesweeper.prototype.start = function(user, cb) {
           }
         }
 
-        console.log(field1);
-        // console.log(field1);
-
-        var game = new GameItem(user, opponent, this.x, this.y, this.stepsToWin, field1, board);
+        var game = new GameItem(user, opponent, this.x, this.y, this.numberOfMines, field1, board);
         var id = [
             Math.random() * 0xffff | 0
             , Math.random() * 0xffff | 0
             , Math.random() * 0xffff | 0
             , Date.now()
         ].join('-');
-        // Добавляем игру в список действующих
+
+        //Add game
         this.games[id] = game;
         this.users[user] = id;
         this.users[opponent] = id;
 
-        //console.dir(this.games[id]);
-        // game.emit('timer', 'start', user);
         cb(true, id, opponent, this.x, this.y);
     } else {
-        // Пока нет, значит будем ждать
+      //wait for game
         this.free[user] = true;
         cb(false);
     }
 }
 
 /**
- * Выходим из игры
+ * Exit game
  */
 Minesweeper.prototype.end = function(user, cb) {
     delete this.free[user];
@@ -383,29 +265,16 @@ Minesweeper.prototype.end = function(user, cb) {
 }
 
 /**
- * Проверяем нет ли победителя
+ * Game over check
  */
 GameItem.prototype.checkEndGame = function(x, y) {
-    // Проверка на ничью, если нет больше свободных полей
-    // console.log('turn ' + turn);
-    if(this.field[x+'x'+y].toString() == 'true'){
-      console.log('checkwinner boom!');
-    }
-    console.log('checkwinner');
     var end = 'win';
     for(arr in this.field){
-      // if(this.field[arr]!=)
-      // console.log(arr+ ': ' +this.board[arr].toString() == false);
-      // console.log(this.board[arr].toString() == 'false');
       if (this.field[arr].toString() != 'true' && this.board[arr].toString().indexOf('open') != -1){
-        // console.log('nice');
-        // console.log('case 1');
       } else if (this.field[arr].toString() != 'true' && this.board[arr].toString().indexOf('open') == -1){
-        console.log('arr: ' + arr + ' this.board[arr].toString(): ' + this.board[arr].toString() + ' this.field[arr].toString() ' + this.field[arr].toString());
         end = 'none';
         break;
       }
     }
-    console.log('win? ' + end);   //Такая фигня работает, всё ок
     return end;
 }

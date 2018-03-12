@@ -151,7 +151,10 @@ a {
 }
 
 #board-table{
-  width: 80%;
+  /*width: 80%;*/
+  table-layout: fixed;
+  width: 1412px;
+  height: 514px;
   position: relative;
   left: 10%;
   border: 2px;
@@ -162,7 +165,11 @@ a {
 
 .table-elem{
   width: 43px;
+  /*min-width: 43px;
+  max-width: 43px;*/
   height: 30px;
+  /*min-height: 30px;
+  max-height: 30px;*/
   text-align: center;
   vertical-align: middle;
 }

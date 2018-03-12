@@ -13,191 +13,95 @@ app.get('/', function(request, response) {
     response.sendFile(path.join(__dirname, 'index.html'));
 });
 
-var players = [];
-
 var Minesweeper = require('./models/game.js');
 var countGames = 0, countPlayers = [],  Game = new Minesweeper();
 
 setInterval(function() {
     gameStats();
-    // console.log(Game.users);
-    // console.log(Game.users[0]);
-    // io.sockets.emit('user_list', 'hi');
-    // console.log(Game);
-    // console.log(typeof(Game.users));
-    // console.log(Object.keys(Game.users));
-    // io.sockets.emit('user_list', Object.keys(Game.users))
 }, 5000);
 
 server.listen(PORT, function() {
     console.log('Starting server on port 5000');
-    console.log(Minesweeper);
-    console.log(Game);
-    // Game.start();
 });
 
 
 io.on('connection', function(socket) {
   gameStats();
-  // socket.on('new-player', function(data, callback) {
-  //   console.log(data.name + ' user connected');
-  //   Game.users[socket.id] = data.name;
-  //
-  //   // socket.emit('socket_log', io.sockets);
-  //   console.log(io.sockets.sockets[socket.id].id);
-  // });
-
   function closeRoom(gameId, opponent) {
     socket.leave(gameId);
     io.sockets.sockets[opponent].leave(gameId);
     // countGames--;
   }
 
-  // setInterval(function() {
-  //   console.log('=========================================');
-  //   console.log(Game);
-  // }, 5000);
-
   socket.on('start', function () {
-    console.log('start');
-    console.log('start');
-    console.log('start');
-    console.log('start');
-    console.log('User with md5 ' + socket.id + ' expects the opponent to start the match');
-    Game.users[socket.id] = true;
-    // if(Game.users[socket.id] !== undefined) {
-    //   console.log('if(Game.users[socket.id] !== undefined)');
-    //   return;
-    // }
-    Game.start(socket.id.toString(), function(start, gameId, opponent, x, y){
-      console.log('start? ' + start);
-        if(start) {
-            // Game.games[gameId].on('timeout', function(user) {
-            //     Game.end(user, function(gameId, opponent, turn) {
-            //         io.sockets.in(gameId).emit('timeout', turn);
-            //         closeRoom(gameId, opponent);
-            //     });
-            // });
 
-            // Подключем к игре соперников в отдельную комнату
-            console.log(opponent);
+    Game.users[socket.id] = true;
+    Game.start(socket.id.toString(), function(start, gameId, opponent, x, y){
+        if(start) {
+
+            // Create game room
             socket.join(gameId);
             io.sockets.sockets[opponent].join(gameId);
-            console.log('ready gameId: ' + gameId + ' x: ' +x + ' y: ' + y);
-            // var arr = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
 
             socket.emit('ready', gameId, x, y);
-            console.log('games');
-            // console.log(Game.games[gameId].field['2x4']);
-            // console.log(Object.keys(Game.games[gameId].field));
-            // console.log(JSON.parse(Game.games[gameId].field));
-            // socket.emit('field', Game.games[gameId].field);
-            // socket.emit('field', Object.keys(Game.games[gameId].field));
-
-            // var arr = 'ds'
-            // socket.emit('field', Game.games[gameId].field);
-            // socket.emit('field', arr);
-            // console.log(arr);
             io.sockets.sockets[opponent].emit('ready', gameId, x, y);
             countGames++;
         } else {
-            // ожидает аппонента
-            console.log('wait');
+          //wait for another player
             io.sockets.sockets[socket.id].emit('wait');
-
         }
         gameStats();
-        console.log(Game);
     });
-
-    // if(Game.users[socket.id] !== undefined) return;
-    // Game.start(socket.id.toString(), function(start, gameId, opponent, x, y){
-    //     if(start) {
-    //         Game.games[gameId].on('timeout', function(user) {
-    //             Game.end(user, function(gameId, opponent, turn) {
-    //                 io.sockets.in(gameId).emit('timeout', turn);
-    //                 closeRoom(gameId, opponent);
-    //             });
-    //         });
-    //
-    //         // Подключем к игре соперников в отдельную комнату
-    //         socket.join(gameId);
-    //         io.sockets.socket(opponent).join(gameId);
-    //         socket.emit('ready', gameId, 'X', x, y);
-    //         io.sockets.socket(opponent).emit('ready', gameId, 'O', x, y);
-    //         countGames++;
-    //     } else {
-    //         // ожидает аппонента
-    //         io.sockets.socket(socket.id).emit('wait');
-    //     }
-    // });
-    // console.log("start");
-    // console.log(Game);
   });
 
   socket.on('step', function (gameId, id, symbol) {
-    console.log('stepp gameId: ' + gameId + ' id: ' + id + ' symbol: ' + symbol);
-    // console.log('Game.games[gameId] === undefined' + Game.games[gameId] === undefined + '');
     if(Game.games[gameId] === undefined) return;
-    // Парсим из ID элемента координаты XxY
-    console.log('serverstep2');
     var coordinates = id.split('x');
-    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]), socket.id.toString(), symbol, function(win, openFieldPart, mineFlag, alreadyChecked, flagIsYours) {
-      // console.log('io.sockets.in(gameId)');
-      // console.log(io.sockets.in(gameId));
-        // io.sockets.in(gameId).emit('step', id, symbol, win);
-        // console.log('this');
-        // console.log(Game.games[gameId]);
-        // console.log(socket.id);
-        // console.log(Game.games[gameId].user);
-        // console.log(Game.games[gameId].user === socket.id);
-        // io.sockets.in(gameId).emit('step', openFieldPart, tmp, win, socket.id);  //каким-то образом массив открытого получить и передать тут
-        // console.log('step win: ' + win);
-        // console.log('Game.games[gameId].user ' + Game.games[gameId].user);
-        // console.log('Game.games[gameId].user === socket.id ' + Game.games[gameId].opponent === socket.id);
-        // console.log('boom == boom: ');
-        // console.log(win == 'boom');
-
+    Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]),
+    socket.id.toString(), symbol, function(win, openFieldPart, mineFlag,
+      alreadyChecked, flagIsYours) {
+      //If game is not over
         if(win == 'none'){
-          // console.log('1');
-          // console.log('Game.games[gameId].opponent === socket.id ' + Game.games[gameId].opponent);
-          // console.log('Game.games[gameId].user === socket.id ' + Game.games[gameId].user);
-          // console.log('socket.id ' + socket.id);
-          // console.log(Game.games[gameId].opponent === socket.id);
-          // console.log(Game.games[gameId].user === socket.id);
+          //check mine
           if(mineFlag){
-            console.log('find mine at ' + openFieldPart);
-            // console.log('changeOwner ' + changeOwner);
-            console.log('socket.id ' + socket.id);
-            console.log('Game.games[gameId].user ' + Game.games[gameId].user);
-            console.log('Game.games[gameId].opponent ' + Game.games[gameId].opponent);
 
             if(socket.id == Game.games[gameId].user){
-              io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, win, Game.games[gameId].user === socket.id, alreadyChecked, flagIsYours );
-              io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, !flagIsYours );
+              io.sockets.sockets[Game.games[gameId].user].emit('findMine',
+              openFieldPart, win, Game.games[gameId].user === socket.id,
+              alreadyChecked, flagIsYours );
+              io.sockets.sockets[Game.games[gameId].opponent].emit('findMine',
+              openFieldPart, win, Game.games[gameId].opponent === socket.id,
+              alreadyChecked, !flagIsYours );
             } else{
-              io.sockets.sockets[Game.games[gameId].user].emit('findMine', openFieldPart, win, Game.games[gameId].user === socket.id, alreadyChecked, !flagIsYours );
-              io.sockets.sockets[Game.games[gameId].opponent].emit('findMine', openFieldPart, win, Game.games[gameId].opponent === socket.id, alreadyChecked, flagIsYours );
+              io.sockets.sockets[Game.games[gameId].user].emit('findMine',
+              openFieldPart, win, Game.games[gameId].user === socket.id,
+              alreadyChecked, !flagIsYours );
+              io.sockets.sockets[Game.games[gameId].opponent].emit('findMine',
+              openFieldPart, win, Game.games[gameId].opponent === socket.id,
+              alreadyChecked, flagIsYours );
             }
-          } else{
+          } else{ //non-mine step
             var sendField = [];
-            console.log('log openFieldPart');
             for(tmp in openFieldPart){
-              console.log(Game.games[gameId].field[openFieldPart[tmp]]);
               sendField.push(Game.games[gameId].field[openFieldPart[tmp]]);
             }
-            io.sockets.sockets[Game.games[gameId].user].emit('step', openFieldPart, sendField, win, Game.games[gameId].user === socket.id);  //каким-то образом массив открытого получить и передать тут
-            io.sockets.sockets[Game.games[gameId].opponent].emit('step', openFieldPart, sendField, win, Game.games[gameId].opponent === socket.id);  //каким-то образом массив открытого получить и передать тут
+            io.sockets.sockets[Game.games[gameId].user].emit('step',
+            openFieldPart, sendField, win, Game.games[gameId].user === socket.id);
+            io.sockets.sockets[Game.games[gameId].opponent].emit('step',
+            openFieldPart, sendField, win, Game.games[gameId].opponent === socket.id);
 
-            // if(win) {
-            //   console.log('checkend');
-            // }
           }
-        } else {
-          var sendField = Object.keys(Game.games[gameId].field).map(function (key) { return Game.games[gameId].field[key]; });
-          var sendBoard = Object.keys(Game.games[gameId].board).map(function (key) { return Game.games[gameId].board[key]; });
-          io.sockets.sockets[Game.games[gameId].user].emit('endGame', openFieldPart, win, Game.games[gameId].user === socket.id, sendField, sendBoard);
-          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame', openFieldPart, win, Game.games[gameId].opponent === socket.id, sendField, sendBoard);
+        } else {  //Game is over
+          var sendField = Object.keys(Game.games[gameId].field)
+          .map(function (key) { return Game.games[gameId].field[key]; });
+          var sendBoard = Object.keys(Game.games[gameId].board)
+          .map(function (key) { return Game.games[gameId].board[key]; });
+          io.sockets.sockets[Game.games[gameId].user].emit('endGame',
+          openFieldPart, win, Game.games[gameId].user === socket.id,
+          sendField, sendBoard);
+          io.sockets.sockets[Game.games[gameId].opponent].emit('endGame',
+          openFieldPart, win, Game.games[gameId].opponent === socket.id,
+          sendField, sendBoard);
           Game.end(socket.id.toString(), function(gameId, opponent){
               closeRoom(gameId, opponent);
           });
@@ -217,11 +121,3 @@ io.on('connection', function(socket) {
 function gameStats(){
   io.sockets.emit('stats', Object.keys(Game.games).length, countGames, Object.keys(Game.users).length);
 }
-// function gameStats(){
-//   io.sockets.emit('stats', [
-//       'Всего игр: ' + countGames,
-//       'Уникальных игроков: ' + Object.keys(countPlayers).length,
-//       'Сейчас игр: ' + Object.keys(Game.games).length,
-//       'Сейчас игроков: ' + Object.keys(Game.users).length
-//   ]);
-// }
