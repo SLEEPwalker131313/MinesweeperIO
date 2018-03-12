@@ -1,3 +1,30 @@
 # MinesweeperIO
-GitKraken check
-Git keys check
+The classic game in the multiplayer version. 
+Rules-standard, open field elements, mark mines, use smart opening. 
+Each game involves two players, and you are not opponents. Your common goal is to win.
+
+## Getting started
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Requirements
+
+What things you need to run the game
+```
+nodejs
+npm
+```
+
+## Runnining
+
+Browse to the project folder and start the server.
+```
+cd /path/to/MinesweeperIO
+nide server.js
+```
+
+After that, the game will be available at
+```
+localhost:5000
+```
+Now you can run at least two browser windows and play this game.
+
