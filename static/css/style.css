@@ -95,6 +95,9 @@ a {
   background-color: #6699CC !important;
   box-shadow: inset 1px 2px 5px #000;
 }
+.ui-state-default-2:hover{
+  background-color: yellow !important;
+}
 
 .ui-state-default:active {
     background-color: #336699;
@@ -109,11 +112,27 @@ a {
   box-shadow: inset 0px 1px 3px #000;
   text-align: center;
 }
+.ui-state-user-mine{
+  background-color: #CCFFFF;
+  box-shadow: inset 0px 1px 3px #000;
+  text-align: center;
+}
+.ui-state-user-mine:hover{
+  background-color: yellow;
+}
 
 .ui-state-opponent{
   background-color: #99FFCC;
   box-shadow: inset 0px 1px 3px #000;
   text-align: center;
+}
+.ui-state-opponent-mine{
+  background-color: #99FFCC;
+  box-shadow: inset 0px 1px 3px #000;
+  text-align: center;
+}
+.ui-state-opponent-mine:hover{
+  background-color: yellow;
 }
 
 #result{

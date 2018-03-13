@@ -53,7 +53,11 @@ var Minesweeper = {
                   }
                 });
                 $("#board-table td").click(function (e) {
-                    socket.emit('step', Minesweeper.gameId, e.target.id, tmp);
+                  // console.log(e);
+                  // console.log(e.target);
+                  // console.log(e.currentTarget);
+                  // console.log(e.target.id);
+                    socket.emit('step', Minesweeper.gameId, e.currentTarget.id, tmp);
                 }).hover(function(){
                     $(this).toggleClass('ui-state-hover');
                 }, function(){
@@ -91,7 +95,7 @@ var Minesweeper = {
         for(var i = 1; i <= x; i++) {
             var tr = $('<tr/>');
             for(var j = 1; j <= y; j++) {
-                tr.append($('<td/>').attr('id', i + 'x' + j)
+                tr.append($('<td/ style="z-index:10;">').attr('id', i + 'x' + j)
                 .addClass('table-elem ui-state-default').html(''));
             }
             table.append(tr);
@@ -126,10 +130,11 @@ var Minesweeper = {
           if($("#" + id).text() == '🏱'){
             $("#" + id).attr('class','ui-state-default-2').html('');
           } else {
-            $("#" + id).attr('class', changeClass).html('<b style="color:red">🏱</b>');
+            $("#" + id).attr('class', changeClass).attr('class', changeClassMine).html('<b style="color:red">🏱</b>');
           }
         }
         var changeClass = (myChange) ? 'ui-state-user' : 'ui-state-opponent';
+        var changeClassMine = (myChange) ? 'ui-state-user-mine' : 'ui-state-opponent-mine';
         drowChangeFindMine(id, changeClass);
 
         var findUserVal = parseInt($('#findUser').text());

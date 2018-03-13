@@ -57,6 +57,7 @@ io.on('connection', function(socket) {
   socket.on('step', function (gameId, id, symbol) {
     if(Game.games[gameId] === undefined) return;
     var coordinates = id.split('x');
+    console.log(coordinates);
     Game.step(gameId, parseInt(coordinates[0]), parseInt(coordinates[1]),
     socket.id.toString(), symbol, function(win, openFieldPart, mineFlag,
       alreadyChecked, flagIsYours) {

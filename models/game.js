@@ -88,6 +88,9 @@ GameItem.prototype.logNearSpace = function (x, y){
  * Step
  */
 GameItem.prototype.step = function(x, y, user, symbol, cb) {
+  // console.log(this.board);
+  console.log(x+'x'+y);
+  console.log(this.board[x+'x'+y]);
     if(this.board[x+'x'+y].toString().indexOf('open') != -1){ //Smart oppening
       if(this.field[x+'x'+y] == 0){
         return;
