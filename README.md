@@ -20,7 +20,7 @@ This application is built on a service architecture, which means that the indivi
 Browse to the project folder and start the gateway.
 ```
 cd /path/to/MinesweeperIO
-node server.js
+node gateway.js
 ```
 Run game services from the services directory
 ```
