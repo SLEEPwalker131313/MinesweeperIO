@@ -8,8 +8,9 @@ var Minesweeper = {
             var socket = io.connect(window.location.hostname + ':5000', {resource: 'api'});
             // $('#name-form').submit(send_name);
             $('#start-game').click(function() {
-              $('#start-game,#github').hide();
-              socket.emit('start');
+              socket.emit('start', 'initGame', function(){
+                $('#start-game,#github').hide();
+              });
             });
 
             socket.on('connect', function () {
