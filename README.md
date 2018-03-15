@@ -14,18 +14,27 @@ What things you need to run the game
 nodejs
 npm
 ```
-
 ## Runnining
 
-Browse to the project folder and start the server.
+This application is built on a service architecture, which means that the individual application modules can be written independently and are run separately as well. To run the application, you must run both gateway and individual services. In the process, the application services can be switched off, they can recover or be replaced by other services that can handle similar requests.
+Browse to the project folder and start the gateway.
 ```
 cd /path/to/MinesweeperIO
 node server.js
+```
+Run game services from the services directory
+```
+cd /path/to/MinesweeperIO/services
+node gamestart.js
+node usermove.js
+node checkendgame.js
+node endgame.js
 ```
 
 After that, the game will be available at
 ```
 localhost:5000
 ```
+It is worth noting that the address localhost:5000 is available after the gateway is launched, but without the launch of additional services, many features may not be available.
 Now you can run at least two browser windows and play this game.
 
